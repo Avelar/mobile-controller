@@ -6,6 +6,7 @@ app.main = (function() {
   var canvas, context;
   var width, height;
   var localUsers = {};
+  var pointer = document.querySelector("#pointer");  
 
   // Initializing socket and adding listener functions
   function socketSetup(){
@@ -22,7 +23,7 @@ app.main = (function() {
 
     socket.on('render', function(data) {
       console.log(data);
-      draw(data);
+      movePointer(data);
     });
 
     // socket.on('debug', function(data) {
@@ -32,12 +33,16 @@ app.main = (function() {
   }
 
   function pointerSetup(){
-    var pointer = document.querySelector("#pointer");
     pointer.style["width"] = "40px";
     pointer.style["height"] = "40px";
     pointer.style["border-radius"] = "20px";
     pointer.style["position"] = "absolute";
     pointer.style["background-color"] = "red";
+  }
+
+  function movePointer(data){
+    pointer.style["top"] = data[user]['pos']['y'] + "px";
+    pointer.style["left"] = data[user]['pos']['x'] + "px";
   }
 
   function init(){
