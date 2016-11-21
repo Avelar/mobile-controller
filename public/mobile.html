@@ -5,12 +5,14 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
       <meta name="author" content="">
       <title>Mobile Controller - Mobile View</title>
+      <link rel="stylesheet" href="css/style.mobile.css">      
    </head>
    <body>
  
       <button id="calibrate-bt">Calibrate</button>
 
-      <div id="do-results">      
+      <!-- DEBUG -->
+      <div id="do-results" class="hidden">      
          <div id="cube" class="cube">
             <div class="face one">1</div>
             <div class="face two">2</div>
@@ -20,48 +22,19 @@
             <div class="face six">6</div>
          </div>
 
-         <!-- <div id="do-info" class="hidden">
+         <div id="do-info">
             <p>
-               Coordinates:
-               (<span id="doTiltFrontToBack" class="value">null</span>,
-               <span id="doTiltLeftToRight" class="value">null</span>,
-               <span id="doDirection" class="value">null</span>)
-               <br />
+               Coordinates:<br/>
+               <span id="doTiltFrontToBack" class="value">null</span><br/>
+               <span id="doTiltLeftToRight" class="value">null</span><br/>
+               <span id="doDirection" class="value">null</span><br/>
                Position absolute? <span id="is-absolute" class="value">unavailable</span>
             </p>
          </div>
-         <div id="dm-info" class="hidden">
-            <p>
-               Acceleration:
-               (<span id="acceleration-x" class="value">null</span>,
-               <span id="acceleration-y" class="value">null</span>,
-               <span id="acceleration-z" class="value">null</span>)
-               m/s<sup>2</sup>
-            </p>
-            <p>
-               Acceleration including gravity:
-               (<span id="acceleration-including-gravity-x" class="value">null</span>,
-               <span id="acceleration-including-gravity-y" class="value">null</span>,
-               <span id="acceleration-including-gravity-z" class="value">null</span>)
-               m/s<sup>2</sup>
-            </p>
-            <p>
-               Rotation rate:
-               (<span id="rotation-rate-beta" class="value">null</span>,
-               <span id="rotation-rate-gamma" class="value">null</span>,
-               <span id="rotation-rate-alpha" class="value">null</span>)
-            </p>
-            <p>
-               Interval: <span id="interval" class="value">0</span> milliseconds
-            </p>
-         </div> -->
       </div>
+      <!-- END DEBUG -->
  
-   <!-- ADD THIS LIBRARY FOR SOCKET.IO -->
-   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-   <!-- SCRIPTS -->
-   <script type="text/javascript" src="js/vendor/jquery-1.11.1.min.js"></script>
-   <script type="text/javascript" src="js/mobile.js"></script>
-
+      <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+      <script type="text/javascript" src="js/mobile.js"></script>
    </body>
 </html>

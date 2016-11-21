@@ -8,7 +8,7 @@ app.main = (function() {
   var localUsers = {};
 
   // Initializing socket and adding listener functions
-  var socketSetup = function(callback){
+  function socketSetup(){
 
     socket = io.connect();
     socket.on('welcome', function(data){
@@ -17,7 +17,7 @@ app.main = (function() {
       socket.emit('dimensions', {
         width: window.innerWidth,
         height: window.innerHeight
-      })
+      });
     });
 
     socket.on('render', function(data) {
@@ -28,71 +28,22 @@ app.main = (function() {
     // socket.on('debug', function(data) {
     //   console.log(data);
     // });
-  };
+    pointerSetup();
+  }
 
-  var canvasSetup = function(){
-    canvas = document.getElementById('maze');
-    context = canvas.getContext ('2d');
-    if (canvas.getContext){
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.style.width = width + 'px';
-      canvas.style.height = height + 'px';
-      context.lineJoin = 'round';
-      context.lineCap = 'round';      
-    }else{
-      document.write ("Your browser doesn't support canvas :S");
-    }
-  };
+  function pointerSetup(){
+    var pointer = document.querySelector("#pointer");
+    pointer.style["width"] = "40px";
+    pointer.style["height"] = "40px";
+    pointer.style["border-radius"] = "20px";
+    pointer.style["position"] = "absolute";
+    pointer.style["background-color"] = "red";
+  }
 
-  function draw(data) {
-
-    // Background
-    context.fillStyle = 'rgba(0, 0, 0, 0.01)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    for(var user in data){
-      var prevX, prevY;
-      if(localUsers.hasOwnProperty(user)){
-        prevX = localUsers[user]['prevX'];
-        prevY = localUsers[user]['prevY'];
-      }else{
-        prevX = data[user]['pos']['x'];
-        prevY = data[user]['pos']['y'];
-      }
-      // console.log('currX: ' + data[user]['pos']['x']);
-      // console.log('prevX: ' + localUsers[user]['prevX']);
-      // console.log(data[user]['color']);
-      // console.log(localUsers);
-
-      // Circle
-      context.beginPath();
-        context.moveTo(prevX, prevY);
-        context.lineTo(data[user]['pos']['x'], data[user]['pos']['y']);      
-        if(data[user]['isDrawing']){
-          
-          // FIRE!
-          context.lineWidth = 30;
-          context.strokeStyle = 'hsla(' + data[user]['color'] + ', 100%, 50%, 0.75)';
-        }else{        
-          context.lineWidth = 3;
-          context.strokeStyle = 'hsla(' + data[user]['color'] + ', 100%, 50%, 0.2)';
-        }
-        context.stroke();
-      context.closePath();
-
-      localUsers[user] = {
-        prevX: data[user]['pos']['x'],
-        prevY: data[user]['pos']['y']
-      }
-    }
-  };
-
-  var init = function(){
+  function init(){
     console.log('Initializing app.');
     socketSetup();
-    canvasSetup();
-  };
+  }
 
   return {
     init: init

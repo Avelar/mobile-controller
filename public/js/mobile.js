@@ -6,7 +6,9 @@ app.main = (function() {
   var orientation = {};
   var isCalibrated = false;
   var isDrawing = false;
+  
   var body = document.querySelector("body");
+  var debug = true;
 
   // Initializing socket and adding listener functions
   var socketSetup = function(callback){
@@ -31,21 +33,23 @@ app.main = (function() {
     el.addEventListener('touchend', handleEnd, false);
     el.addEventListener('touchcancel', handleEnd, false);
 
-    // check if DeviceOrientationEvent is supported
-    if (!window.DeviceOrientationEvent) {
-      var unsupported = document.createElement("span");
-      unsupported.innerHTML = "deviceorientation event not supported";
-      body.append(unsupported);
-    } else {
-      //listen for event and handle DeviceOrientationEvent object
-      window.addEventListener('deviceorientation', function(event) {
+    console.log(window.DeviceOrientationEvent);
+
+    //listen for event and handle DeviceOrientationEvent object
+    window.addEventListener('deviceorientation', function(event) {
+
+      // check if DeviceOrientationEvent is supported
+      if(event.alpha || event.beta || event.gamma){
         orientation = getOrientation(event);
-        displayOrientation(event);
-        if(isCalibrated){
-          emitOrientation();
-        }
-      });
-    }
+        if(isCalibrated) emitOrientation();
+        if(debug) displayOrientation(event);
+      }else{
+        console.log("deviceorientation event not supported");
+        var unsupported = document.createElement("span");
+        unsupported.innerHTML = "deviceorientation event not supported";
+        body.append(unsupported);
+      }
+    });
   };
 
   var touches = 0;
@@ -109,25 +113,27 @@ app.main = (function() {
   }
 
   function displayOrientation(){
+    
+    document.querySelector("#do-results").classList.remove("hidden");
+
     // rotate image using CSS3 transform
     var cube = document.getElementById('cube');
 
-    // gamma is the left-to-right tilt in degrees, where right is positive
-    var tiltLeftToRight = event.gamma;
-    // beta is the front-to-back tilt in degrees, where front is positive
-    var tiltFrontToBack = event.beta;
-    // alpha is the compass direction the device is facing in degrees
-    var direction = event.alpha;
+    var tiltLeftToRight = event.gamma;  // left-to-right tilt in degrees, where right is positive
+    var tiltFrontToBack = event.beta;   // front-to-back tilt in degrees, where front is positive
+    var direction = event.alpha;        // compass direction the device is facing in degrees
 
+    // rotate image using CSS3 transform
+    var cube = document.getElementById('cube');
     cube.style.webkitTransform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
     cube.style.MozTransform = 'rotate(' + tiltLeftToRight + 'deg)';
     cube.style.transform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
 
-    // // set HTML content = tilt OR direction degree (rounded to nearest integer)
-    // document.getElementById('doTiltFrontToBack').innerHTML = Math.round(tiltFrontToBack);
-    // document.getElementById('doTiltLeftToRight').innerHTML = Math.round(tiltLeftToRight);
-    // document.getElementById('doDirection').innerHTML = Math.round(direction);
-    // document.getElementById('is-absolute').innerHTML = event.absolute ? "true" : "false";
+    // set HTML content = tilt OR direction degree (rounded to nearest integer)
+    document.getElementById('doTiltFrontToBack').innerHTML = "beta: " + Math.round(tiltFrontToBack);
+    document.getElementById('doTiltLeftToRight').innerHTML = "gamma: " + Math.round(tiltLeftToRight);
+    document.getElementById('doDirection').innerHTML = "alpha: " + Math.round(direction);
+    document.getElementById('is-absolute').innerHTML = event.absolute ? "true" : "false";
   }
 
   var init = function(){
