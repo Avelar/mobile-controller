@@ -16,9 +16,16 @@
       
       <section id="tpl-connection" class="hidden">
          <h1>Connection</h1>
+         <input type="text" id="key-input">
+         <button id="match-bt">Go</button>
+
+         <!-- WRONG KEY -->
+         <div id="do-wrong-key" class="hidden">
+            <p>Ooops, something went wrong. Please refresh both screens (computer and this).</p>
+         </div>
       </section>
 
-      <section id="tpl-callibration" class="hidden">
+      <section id="tpl-calibration" class="hidden">
          <h1>Calibration</h1>
          <div id="calibrate-bt"> 
             <p id="calibrate-msg">Calibrate:<br/>TOP-LEFT</p>
@@ -49,9 +56,9 @@
       </section>
  
       <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-      <script type="text/javascript" src="js/mobile-login.js"></script>
-      <script type="text/javascript" src="js/mobile-calibration.js"></script>
-      <script type="text/javascript" src="js/mobile-controller.js"></script>
+      <script type="text/javascript" src="js/controllers/mobile-connection.js"></script>
+      <!--<script type="text/javascript" src="js/mobile-calibration.js"></script>
+      <script type="text/javascript" src="js/mobile-controller.js"></script>-->
       <script type="text/javascript" src="js/mobile-app.js"></script>      
    </body>
 </html>

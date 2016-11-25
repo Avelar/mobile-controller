@@ -49,9 +49,14 @@ io.on('connection', function(socket) {
       users: users
   });
 
-  socket.on("match-key", function(data){
+  socket.on("match-key", function(data, callback){
     console.log('SOCKET: match-key');
     console.log(data);
+    if(data === "1234"){
+      callback("right-key");
+    }else{
+      callback("wrong-key");
+    }
   });
 
   //Our event handlers

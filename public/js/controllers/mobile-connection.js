@@ -1,18 +1,33 @@
-var connection = function(){
+var connection = (function(){
+
+  console.log("Loaded module: connection");
   
   var obj = {};
-  var body = document.querySelector("body");
 
   obj.init = function(socket){
-    var loginBt = document.querySelector("login-bt");
-    loginBt.addListener("click", function(){
-      matchKey(socket);
-    });
+    attachEvents(socket);
   };
 
+  function attachEvents(socket){
+    var matchBt = document.querySelector("#match-bt");
+    matchBt.addEventListener("click", function(){
+      matchKey(socket);
+    });
+  }
+
   function matchKey(socket){
-    socket.emit("match-key", "1234");
+
+    var key = document.querySelector("#key-input").value;
+
+    socket.emit("match-key", key, function(data){
+      console.log(data);
+      if(data === "right-key"){
+        location.hash = "calibration";
+      }else{
+        document.querySelector("#do-wrong-key").classList.remove("hidden");
+      }
+    });
   }
 
   return obj;
-};
+})();
