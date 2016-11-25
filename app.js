@@ -16,14 +16,15 @@ app.use('*', function(req, res) {
   // console.log(req.headers['user-agent']);
   // Say if req.headers['user-agent'] contains "Mobile", re-route the user to mobile interface
   var ua = req.headers['user-agent'];
-  if (ua.indexOf('Mobile') > -1) {
-    console.log('User is using mobile device');
-    res.redirect('mobile.html');
-  } else {
-    // Else display a desktop version
-    console.log('User is using desktop device');
-    res.redirect('desktop.html');
-  }
+  res.redirect('mobile.html');
+  // if (ua.indexOf('Mobile') > -1) {
+  //   console.log('User is using mobile device');
+  //   res.redirect('mobile.html');
+  // } else {
+  //   // Else display a desktop version
+  //   console.log('User is using desktop device');
+  //   res.redirect('desktop.html');
+  // }
 });
 
 server.listen(PORT, function(){
@@ -46,6 +47,11 @@ io.on('connection', function(socket) {
   socket.emit('welcome', {
       msg: 'Welcome! your id is ' + socket.id,
       users: users
+  });
+
+  socket.on("match-key", function(data){
+    console.log('SOCKET: match-key');
+    console.log(data);
   });
 
   //Our event handlers
