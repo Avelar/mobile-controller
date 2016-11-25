@@ -21,6 +21,7 @@ app.main = (function() {
         height: window.innerHeight
       }, function(data){
         console.log(data);
+        document.querySelector("#key").innerHTML = data;
       });
     });
 
