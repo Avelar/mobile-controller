@@ -33,10 +33,7 @@ server.listen(PORT, function(){
 
 var users = {};
 var loop;
-var dimensions = {
-  x: "",
-  y: ""
-};
+
 
 //Assign function to 'connection' event for the connected socket
 io.on('connection', function(socket) {
@@ -49,42 +46,48 @@ io.on('connection', function(socket) {
       users: users
   });
 
+  // DESKTOP
+  // Getting dimensions
+  socket.on('add-desktop', function(data, callback){
+    console.log("SOCKET: add-desktop");
+    console.log(data);
+
+    // Dimensions are specific to each "user" (a desktop/mobile pair)
+    // We'll send them when adding a new user
+    addDesktopUser(socket.id, data["width"], data["height"], function(key){
+      // After the (desktop) user is added, send the key to render on the screen
+      callback(key);
+    });
+  });
+
+
+  // MOBILE
+  socket.on('add-mobile', function(data) {
+    console.log('SOCKET: add-mobile');
+    console.log(data);
+    addMobileUser(socket.id);
+  });
+
   socket.on("match-key", function(data, callback){
     console.log('SOCKET: match-key');
     console.log(data);
-    if(data === "1234"){
-      callback("right-key");
-    }else{
-      callback("wrong-key");
-    }
+    matchMobileUser(socket.id, data, function(msg){
+      callback(msg);
+    });
   });
 
-  //Our event handlers
-  // Is this coming from a mobile device?
-  socket.on('add-me', function(data) {
-    console.log('SOCKET: add-me');
-    console.log(data);
-    addUser(socket.id);
-  });
 
-  // Getting dimensions
-  socket.on('dimensions', function(data){
-    console.log("SOCKET: dimensions");
-    console.log(data);
-    dimensions["x"] = data["width"];
-    dimensions["y"] = data["height"];
-  });
 
   // socket.on('calibrate', function(data) {
   //   console.log('SOCKET: calibrate');
   //   console.log(data);
-  //   calibrateUser(socket.id, data);
+  //   calibrateMobileUser(socket.id, data);
   // });
 
   socket.on("new-calibration", function(data){
     console.log("New calibration.");
     console.log(data);
-    calibrateUser(socket.id, data);
+    calibrateMobileUser(socket.id, data);
   });
 
   // Listening for coordinates
@@ -111,8 +114,8 @@ function renderOnClient(){
   io.sockets.emit('render', users);
 }
 
-// function calibrateUser(id, data){
-//   console.log('FUNCTION: calibrateUser');
+// function calibrateMobileUser(id, data){
+//   console.log('FUNCTION: calibrateMobileUser');
 //   if(data.x > 180){
 //     data.x -= 360;
 //   }  
@@ -129,8 +132,43 @@ function renderOnClient(){
 //   }  
 // }
 
-function calibrateUser(id, data){
-  console.log('FUNCTION: calibrateUser');
+
+// MOBILE
+function addMobileUser(id) {
+  console.log('FUNCTION: addMobileUser');
+  if(!users.hasOwnProperty(id)) {
+      users[id] = {
+        type: "mobile",
+        offset: {
+          x: {
+            min: "",
+            max: ""
+          },
+          y: {
+            min: "",
+            max: ""
+          }
+        }
+      };
+      console.log("New user:" + users[id]);
+  }
+  console.log('current users: ' + Object.keys(users).length);
+}
+
+function matchMobileUser(id, key, callback){
+  var msg = "wrong-key";
+  for(prop in users){
+    // Loop through users and find the desktop one with a matching key and no partner
+    if(users[prop]["type"] === "desktop" && users[prop]["key"] === key && users[prop]["partner"] === ""){
+      msg = "right-key";
+      users[prop]["partner"] = id;
+    }
+  }
+  callback(msg);
+}
+
+function calibrateMobileUser(id, data){
+  console.log('FUNCTION: calibrateMobileUser');
   // if(data.x > 180){
   //   data.x -= 360;
   // }
@@ -205,35 +243,77 @@ function angleToPosition(id, angle, axis){
   // console.log(axis, users[id]['pos'][axis]);
 }
 
-function addUser(id) {
-  console.log('FUNCTION: addUser');
+
+
+// DESKTOP
+
+function addDesktopUser(id, width, height, callback) {
+  console.log('FUNCTION: addDesktopUser');
   if(!users.hasOwnProperty(id)) {
       users[id] = {
-          color: Math.round(Math.random()*290),
-          pos: {
-            x: 50,
-            y: 50
+        type: "desktop",
+        key: generateKey(),
+        dimensions: {
+            x: width,
+            y: height
           },
-          offset: {
-            x: 0,
-            y: 0
-          },
-          isDrawing: false
-      }
+        partner: ""
+      };
+
+      console.log("New user:" + JSON.stringify(users[id]));
+      callback(users[id]["key"]);
   }
   console.log('current users: ' + Object.keys(users).length);
+}
+
+function generateKey(){
+  // http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript
+  var possible = "0123456789";
+  var uniqueKey = newKey();
+
+  var existingKeys = [];
+  for(prop in users){
+    existingKeys.push(users[prop]["key"]);
+  }
+
+  // Let's check whether the key already exist
+  while(existingKeys.indexOf(uniqueKey) > -1){
+    uniqueKey = newKey();
+  }
+
+  function newKey(){
+    var key = "";
+    for(var i=0; i < 4; i++){
+      key += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return key;
+  }
+  return uniqueKey;
 }
 
 function removeUser(id) {
   console.log('FUNCTION: removeUser');
   if(users.hasOwnProperty(id)) {
-      delete users[id]
+
+      // remove user from "partner" property on desktop ones
+      if(users["type"] === "mobile"){
+        for(prop in users){
+          if(users[prop]["partner"] === id){
+            users[prop]["partner"] = "";
+          }
+        }
+      }
+
+      // remove id from user list
+      delete users[id];
   }
   console.log('current users: ' + Object.keys(users).length);
   if(Object.keys(users).length === 0){
     clearInterval(loop);
   }
 }
+
+// HELPERS
 var map = function (n, start1, stop1, start2, stop2) {
   return (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
 };

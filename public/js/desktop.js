@@ -15,9 +15,12 @@ app.main = (function() {
     socket.on('welcome', function(data){
       console.log('SOCKET: welcome');
       console.log(data.msg);
-      socket.emit('dimensions', {
+      
+      socket.emit('add-desktop', {
         width: window.innerWidth,
         height: window.innerHeight
+      }, function(data){
+        console.log(data);
       });
     });
 
