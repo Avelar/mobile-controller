@@ -154,7 +154,7 @@ function addMobileUser(id) {
           }
         }
       };
-      console.log("New user:" + users[id]);
+      console.log("New user:" + JSON.stringify(users[id]));
   }
   console.log('current users: ' + Object.keys(users).length);
 }
@@ -302,7 +302,7 @@ function removeUser(id) {
   if(users.hasOwnProperty(id)) {
 
       // remove user from "partner" property on desktop ones
-      if(users["type"] === "mobile"){
+      if(users[id]["type"] === "mobile"){
         for(prop in users){
           if(users[prop]["partner"] === id){
             users[prop]["partner"] = "";
@@ -314,6 +314,7 @@ function removeUser(id) {
       delete users[id];
   }
   console.log('current users: ' + Object.keys(users).length);
+  console.log(JSON.stringify(users));
   if(Object.keys(users).length === 0){
     clearInterval(loop);
   }
