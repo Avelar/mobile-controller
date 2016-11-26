@@ -1,6 +1,6 @@
 var app = app || {};
 
-app.main = (function() {
+app.main = (function(connection) {
 
   var socket;
 
@@ -18,9 +18,8 @@ app.main = (function() {
       console.log('SOCKET: welcome');
       console.log(data.msg);
       console.log(data.users);
+      attachEvents();
     });
-
-    attachEvents();
   }
 
   function attachEvents(){
@@ -56,6 +55,6 @@ app.main = (function() {
     init: init
   };
 
-})();
+})(connection);
 
 window.addEventListener('DOMContentLoaded', app.main.init);

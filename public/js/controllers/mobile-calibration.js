@@ -5,9 +5,14 @@ var calibration = (function(){
   var obj = {};
   var socket;
 
-  obj.init = function(socket){
-    
+  obj.init = function(_socket){
+    socket = _socket;
+    socketSetup();
   };
+
+  function socketSetup(){
+    attachEvents();
+  }
 
   function attachEvents(){
 

@@ -20,26 +20,17 @@ app.main = (function(connection, calibration) {
     socket.on('welcome', function(data) {
       console.log(data.msg);
       console.log(data.users);
+      attachEvents();
     });
-
-    attachEvents();
   }
 
   function attachEvents(){
     window.addEventListener('hashchange', hashRouter);
-    // window.addEventListener('deviceorientation', detectSupport);
-    window.addEventListener('deviceorientation', function(){
-      // if(detectSupport(event)){
-        initModules();
-      // }else{
-      //   location.hash = "unsupported";
-      // }
-    });
-  }
-
-  function detectSupport(event){
-      // check if DeviceOrientationEvent is supported
-      return (event.alpha || event.beta || event.gamma) ? (true) : (false);
+    if(window.DeviceOrientationEvent){
+      initModules();
+    }else{
+      location.hash = "unsupported";
+    }
   }
 
   function initModules(){
@@ -49,6 +40,7 @@ app.main = (function(connection, calibration) {
     // We have to send the local socket object to the external modules,
     // so that they can communicate with the server
     connection.init(socket);
+    calibration.init(socket);
 
     // Now let's call our first "page", connection
     location.hash = "connection";
