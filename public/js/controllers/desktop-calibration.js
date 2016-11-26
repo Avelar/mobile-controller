@@ -13,8 +13,6 @@ var calibration = (function(){
 
   function socketSetup(){
 
-    console.log(socket);
-
     socket.on("to-desktop-top-left-confirmation", function(data) {
       console.log(data);
       renderInstructions("do-bottom-right");
