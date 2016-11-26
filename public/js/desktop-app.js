@@ -1,6 +1,6 @@
 var app = app || {};
 
-app.main = (function(connection) {
+app.main = (function(connection, calibration) {
 
   var socket;
 
@@ -30,6 +30,7 @@ app.main = (function(connection) {
   function initModules(){
     console.log("initModules");
     connection.init(socket);
+    calibration.init(socket);
     location.hash = "connection";
   }
 
@@ -55,6 +56,6 @@ app.main = (function(connection) {
     init: init
   };
 
-})(connection);
+})(connection, calibration);
 
 window.addEventListener('DOMContentLoaded', app.main.init);

@@ -3,7 +3,6 @@ var app = app || {};
 app.main = (function(connection, calibration) {
 
   var socket;
-  var body = document.querySelector("body");
 
   function init(){
     console.log('Initializing app.');
@@ -26,11 +25,11 @@ app.main = (function(connection, calibration) {
 
   function attachEvents(){
     window.addEventListener('hashchange', hashRouter);
-    if(window.DeviceOrientationEvent){
+    // if(window.DeviceOrientationEvent){
       initModules();
-    }else{
-      location.hash = "unsupported";
-    }
+    // }else{
+    //   location.hash = "unsupported";
+    // }
   }
 
   function initModules(){

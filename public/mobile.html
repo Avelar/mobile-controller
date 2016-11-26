@@ -8,12 +8,14 @@
       <link rel="stylesheet" href="css/style.mobile.css">
    </head>
    <body>
-      
+
+      <!-- DEVICE ORIENTATION NOT SUPPORTED -->      
       <section id="tpl-unsupported" class="hidden">
          <h1>Not supported</h1>
          <div>deviceorientation event not supported</div>
       </section>
       
+      <!-- CONNECT TO SCREEN -->
       <section id="tpl-connection" class="hidden">
          <h1>Connection</h1>
          <input id="key-input" type="tel">
@@ -25,6 +27,7 @@
          </div>
       </section>
 
+      <!-- CALIBRATE MOBILE -->
       <section id="tpl-calibration" class="hidden">
          <h1>Calibration</h1>
          <div id="calibrate-bt"> 
@@ -54,6 +57,11 @@
          </div>
          <!-- END DEBUG -->
       </section>
+
+      <!-- CONTROLLER -->
+      <section id="tpl-controller" class="hidden">
+         <h1>Controller</h1>
+      </section>      
  
       <!-- Socket -->
       <script type="text/javascript" src="/socket.io/socket.io.js"></script>

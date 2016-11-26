@@ -48,8 +48,8 @@ io.on('connection', function(socket) {
 
   // DESKTOP
   // Getting dimensions
-  socket.on('add-desktop', function(data, callback){
-    console.log("SOCKET: add-desktop");
+  socket.on('from-desktop-add', function(data, callback){
+    console.log("SOCKET: from-desktop-add");
     console.log(data);
 
     // Dimensions are specific to each "user" (a desktop/mobile pair)
@@ -60,39 +60,56 @@ io.on('connection', function(socket) {
     });
   });
 
+  socket.on("from-desktop-reset-calibration", function(){
+    console.log("SOCKET: from-desktop-reset-calibration");
+    resetMobileCalibration();
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-mobile-reset-calibration");
+  });
+
+  socket.on("from-desktop-start-controller", function(){
+    console.log("SOCKET: from-desktop-start-controller");
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-mobile-start-controller");
+  });
+
+
 
   // MOBILE
-  socket.on('add-mobile', function(data, callback) {
-    console.log('SOCKET: add-mobile');
+  socket.on('from-mobile-add', function() {
+    console.log('SOCKET: from-mobile-add');
     addMobileUser(socket.id);
   });
 
-  socket.on("match-key", function(data, callback){
-    console.log('SOCKET: match-key');
+  socket.on("from-mobile-match-key", function(data, callback){
+    console.log('SOCKET: from-mobile-match-key');
     console.log(data);
-    matchMobileUser(socket.id, data, function(msg, room){
+    matchMobileUser(socket.id, data, function(msg, partner){
       callback(msg);
-      if(room !== undefined){
-        socket.join(room);
-        console.log(socket.rooms);
-        io.to(room).emit("joined-room", "Welcome to room " +  room);
+      if(partner !== undefined){
+        socket.emit("to-mobile-confirm-connection", "You're now partnered with " + partner);
+        socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-confirm-connection", "You're now partnered with " + socket.id);
       }
     });
   });
 
+  socket.on("from-mobile-calibrate-top-left", function(data){
+    console.log("SOCKET: from-mobile-calibrate-top-left");
+    console.log(data);
+    calibrateMobileTopLeft(socket.id, data);
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-top-left-confirmation", users[socket.id]["offset"]);
+  });
 
+  socket.on("from-mobile-calibrate-bottom-right", function(data){
+    console.log("SOCKET: from-mobile-calibrate-bottom-right");
+    console.log(data);
+    calibrateMobileBottomRight(socket.id, data);
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-bottom-right-confirmation", users[socket.id]["offset"]);
+  });
 
   // socket.on('calibrate', function(data) {
   //   console.log('SOCKET: calibrate');
   //   console.log(data);
   //   calibrateMobileUser(socket.id, data);
   // });
-
-  socket.on("new-calibration", function(data){
-    console.log("New calibration.");
-    console.log(data);
-    calibrateMobileUser(socket.id, data);
-  });
 
   // Listening for coordinates
   socket.on('orientation', function(data) {
@@ -118,23 +135,6 @@ function renderOnClient(){
   io.sockets.emit('render', users);
 }
 
-// function calibrateMobileUser(id, data){
-//   console.log('FUNCTION: calibrateMobileUser');
-//   if(data.x > 180){
-//     data.x -= 360;
-//   }  
-//   if(users.hasOwnProperty(id)){
-//     users[id]['offset'] = {
-//       x: data.x,
-//       y: data.y
-//     }
-//     if(Object.keys(users).length === 1){
-//       loop = setInterval(function(){
-//         renderOnClient(io);
-//       }, 20);
-//     }    
-//   }  
-// }
 
 
 // MOBILE
@@ -152,7 +152,8 @@ function addMobileUser(id) {
             min: "",
             max: ""
           }
-        }
+        },
+        partner: ""
       };
       console.log("New user:" + JSON.stringify(users[id]));
   }
@@ -161,51 +162,75 @@ function addMobileUser(id) {
 
 function matchMobileUser(id, key, callback){
   var msg = "wrong-key";
-  var room;
+  var partner;
   for(prop in users){
     // Loop through users and find the desktop one with a matching key and no partner
     if(users[prop]["type"] === "desktop" && users[prop]["key"] === key && users[prop]["partner"] === ""){
       msg = "right-key";
       users[prop]["partner"] = id;
-      room = prop;
+      users[id]["partner"] = prop;
+      console.log(JSON.stringify(users[id]));
+      partner = prop;
     }
   }
-  callback(msg, room);
+  callback(msg, partner);
 }
 
-function calibrateMobileUser(id, data){
-  console.log('FUNCTION: calibrateMobileUser');
-  // if(data.x > 180){
-  //   data.x -= 360;
-  // }
-  // console.log()
-  data["alpha"]["min"] = fixAngle(data["alpha"]["min"]);
-  data["alpha"]["max"] = fixAngle(data["alpha"]["max"]);
-  data["beta"]["min"] = fixAngle(data["beta"]["min"]);
-  data["beta"]["max"] = fixAngle(data["beta"]["max"]);
+function calibrateMobileTopLeft(id, data){
+  console.log('FUNCTION: calibrateMobileTopLeft');
+
+  data["alphaMin"] = fixAngle(data["alphaMin"]);
+  data["betaMax"] = fixAngle(data["betaMax"]);
   
   if(users.hasOwnProperty(id)){
       users[id]['offset'] = {
         x: {
-          min: data["alpha"]["min"],
-          max: data["alpha"]["max"]
+          min: data["alphaMin"]
         },
         y: {
-          min: data["beta"]["min"],
-          max: data["beta"]["max"]
+          max: data["betaMax"]
         }
       };
     console.log(users[id]['offset']);
-    // users[id]['offset'] = {
-    //   x: data.x,
-    //   y: data.y
-    // }
+  }
+}
 
+function calibrateMobileBottomRight(id, data){
+  console.log('FUNCTION: calibrateMobileBottomRight');
+
+  data["alphaMax"] = fixAngle(data["alphaMax"]);
+  data["betaMin"] = fixAngle(data["betaMin"]);
+  
+  if(users.hasOwnProperty(id)){
+      users[id]['offset'] = {
+        x: {
+          max: data["alphaMax"]
+        },
+        y: {
+          min: data["betaMin"]
+        }
+      };
+    console.log(users[id]['offset']);
+  }
     // if(Object.keys(users).length === 1){
     //   loop = setInterval(function(){
     //     renderOnClient(io);
     //   }, 20);
-    // }    
+    // }      
+}
+
+function resetMobileCalibration(id){
+  if(users.hasOwnProperty(id)){
+    users[id]['offset'] = {
+      x: {
+        min: "",
+        max: ""
+      },
+      y: {
+        min: "",
+        max: ""
+      }
+    };
   }
 }
 
@@ -301,14 +326,14 @@ function removeUser(id) {
   console.log('FUNCTION: removeUser');
   if(users.hasOwnProperty(id)) {
 
-      // remove user from "partner" property on desktop ones
-      if(users[id]["type"] === "mobile"){
+      // remove user from "partner" property
+      // if(users[id]["type"] === "mobile"){
         for(prop in users){
           if(users[prop]["partner"] === id){
             users[prop]["partner"] = "";
           }
         }
-      }
+      // }
 
       // remove id from user list
       delete users[id];

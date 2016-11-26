@@ -4,6 +4,7 @@ var calibration = (function(){
   
   var obj = {};
   var socket;
+  var touches = 0;
 
   obj.init = function(_socket){
     socket = _socket;
@@ -12,9 +13,15 @@ var calibration = (function(){
 
   function socketSetup(){
 
-    socket.on('calibration-top-left', function(data) {
+    console.log(socket);
+
+    socket.on("to-desktop-top-left-confirmation", function(data) {
       console.log(data);
-      location.hash = "calibration";
+      renderInstructions("do-bottom-right");
+    });
+    socket.on("to-desktop-bottom-right-confirmation", function(data) {
+      console.log(data);
+      renderInstructions("do-done");
     });
 
     attachEvents();
@@ -23,14 +30,25 @@ var calibration = (function(){
   function attachEvents(){
     var resetCalibrationBt = document.querySelector("#reset-calibration-bt");
     resetCalibrationBt.addEventListener("click", resetCalibration);
+
+    var continueBt = document.querySelector("#continue-bt");
+    continueBt.addEventListener("click", function(){
+      location.hash = "controller";
+      socket.emit("from-desktop-start-controller");
+    });
   }
 
-  function calibrate(){
-    
+  function renderInstructions(id){
+    var instructions = document.querySelectorAll(".instructions");
+    for(var i = 0; i < instructions.length; i++){
+      instructions[i].classList.add("hidden");
+    }
+    document.querySelector("#"+id).classList.remove("hidden");
   }
 
   function resetCalibration(){
-
+    socket.emit("from-desktop-reset-calibration");
+    renderInstructions("do-top-left");
   }
 
   return obj;

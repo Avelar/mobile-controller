@@ -16,7 +16,7 @@ var connection = (function(){
     console.log("socketSetup");
 
     // Start by asking to be added to the list of users and sending screen dimensions
-    socket.emit('add-desktop', {
+    socket.emit('from-desktop-add', {
       width: window.innerWidth,
       height: window.innerHeight
     }, function(data){
@@ -24,7 +24,7 @@ var connection = (function(){
       document.querySelector("#key").innerHTML = data;
     });
 
-    socket.on('joined-room', function(data) {
+    socket.on('to-desktop-confirm-connection', function(data) {
       console.log(data);
       location.hash = "calibration";
     });
