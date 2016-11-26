@@ -3,20 +3,33 @@ var connection = (function(){
   console.log("Loaded module: connection");
   
   var obj = {};
+  var socket;
 
-  obj.init = function(socket){
-    attachEvents(socket);
+  obj.init = function(_socket){
+    socket = _socket;
+    socketSetup();
   };
 
-  function attachEvents(socket){
+  function socketSetup(){
+    
+    // Start by asking to be added to th list of users and sending screen dimensions
+    socket.emit('add-mobile');
+    socket.on('joined-room', function(data) {
+      console.log(data);
+    });
+
+    attachEvents();
+  }
+
+  function attachEvents(){
+    
     var matchBt = document.querySelector("#match-bt");
     matchBt.addEventListener("click", function(){
-      matchKey(socket);
+      matchKey();
     });
   }
 
-  function matchKey(socket){
-
+  function matchKey(){
     var key = document.querySelector("#key-input").value;
 
     socket.emit("match-key", key, function(data){

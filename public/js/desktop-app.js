@@ -17,19 +17,39 @@ app.main = (function() {
     socket.on('welcome', function(data){
       console.log('SOCKET: welcome');
       console.log(data.msg);
-      
-      socket.emit('add-desktop', {
-        width: window.innerWidth,
-        height: window.innerHeight
-      }, function(data){
-        console.log(data);
-        document.querySelector("#key").innerHTML = data;
-      });
+      console.log(data.users);
     });
 
-    socket.on('joined-room', function(data) { //when we get data from socket
-      console.log(data);
-    });
+    attachEvents();
+  }
+
+  function attachEvents(){
+    window.addEventListener('hashchange', hashRouter);
+    initModules();
+  }
+
+  function initModules(){
+    console.log("initModules");
+    connection.init(socket);
+    location.hash = "connection";
+  }
+
+  function hashRouter(){
+    var currentPage = location.hash.substring(1, location.hash.length);
+    console.log('Current hash is ' + currentPage);
+    render("tpl-" + currentPage);
+  }
+
+  function render(section){
+    console.log("render: " + section);
+    var sections = document.getElementsByTagName("section");
+    for(var i = 0; i < sections.length; i++){
+      if(sections[i].id === section){
+        sections[i].classList.remove("hidden");
+      }else{
+        sections[i].classList.add("hidden");
+      }
+    }
   }
 
   return {

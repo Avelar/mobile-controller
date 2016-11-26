@@ -20,11 +20,6 @@ app.main = (function(connection, calibration) {
     socket.on('welcome', function(data) {
       console.log(data.msg);
       console.log(data.users);
-      socket.emit('add-mobile');
-    });
-
-    socket.on('joined-room', function(data) {
-      console.log(data);
     });
 
     attachEvents();
