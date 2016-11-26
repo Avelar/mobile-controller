@@ -3,12 +3,17 @@ var app = app || {};
 app.main = (function() {
 
   var socket;
-  var width, height;
+
+  function init(){
+    console.log('Initializing app.');
+    socketSetup();
+  }
 
   // Initializing socket and adding listener functions
   function socketSetup(){
 
     socket = io.connect();
+
     socket.on('welcome', function(data){
       console.log('SOCKET: welcome');
       console.log(data.msg);
@@ -22,33 +27,9 @@ app.main = (function() {
       });
     });
 
-    socket.on('render', function(data) {
+    socket.on('joined-room', function(data) { //when we get data from socket
       console.log(data);
-      movePointer(data);
     });
-
-    // socket.on('debug', function(data) {
-    //   console.log(data);
-    // });
-    pointerSetup();
-  }
-
-  function pointerSetup(){
-    pointer.style["width"] = "40px";
-    pointer.style["height"] = "40px";
-    pointer.style["border-radius"] = "20px";
-    pointer.style["position"] = "absolute";
-    pointer.style["background-color"] = "red";
-  }
-
-  function movePointer(data){
-    pointer.style["top"] = data[user]['pos']['y'] + "px";
-    pointer.style["left"] = data[user]['pos']['x'] + "px";
-  }
-
-  function init(){
-    console.log('Initializing app.');
-    socketSetup();
   }
 
   return {

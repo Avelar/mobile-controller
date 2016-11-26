@@ -70,8 +70,13 @@ io.on('connection', function(socket) {
   socket.on("match-key", function(data, callback){
     console.log('SOCKET: match-key');
     console.log(data);
-    matchMobileUser(socket.id, data, function(msg){
+    matchMobileUser(socket.id, data, function(msg, room){
       callback(msg);
+      if(room !== undefined){
+        socket.join(room);
+        console.log(socket.rooms);
+        io.to(room).emit("joined-room", "Welcome to room " +  room);
+      }
     });
   });
 
@@ -156,14 +161,16 @@ function addMobileUser(id) {
 
 function matchMobileUser(id, key, callback){
   var msg = "wrong-key";
+  var room;
   for(prop in users){
     // Loop through users and find the desktop one with a matching key and no partner
     if(users[prop]["type"] === "desktop" && users[prop]["key"] === key && users[prop]["partner"] === ""){
       msg = "right-key";
       users[prop]["partner"] = id;
+      room = prop;
     }
   }
-  callback(msg);
+  callback(msg, room);
 }
 
 function calibrateMobileUser(id, data){

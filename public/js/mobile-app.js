@@ -5,6 +5,11 @@ app.main = (function(connection, calibration) {
   var socket;
   var body = document.querySelector("body");
 
+  function init(){
+    console.log('Initializing app.');
+    socketSetup();
+  }
+
   // Initializing socket and adding listener functions
   function socketSetup(){
   
@@ -12,11 +17,14 @@ app.main = (function(connection, calibration) {
   
     socket = io.connect();
 
-    // Assigning function to the 'start' event on that socket
-    socket.on('welcome', function(data) { //when we get data from socket
+    socket.on('welcome', function(data) {
       console.log(data.msg);
       console.log(data.users);
       socket.emit('add-mobile');
+    });
+
+    socket.on('joined-room', function(data) {
+      console.log(data);
     });
 
     attachEvents();
@@ -26,11 +34,11 @@ app.main = (function(connection, calibration) {
     window.addEventListener('hashchange', hashRouter);
     // window.addEventListener('deviceorientation', detectSupport);
     window.addEventListener('deviceorientation', function(){
-      if(detectSupport(event)){
+      // if(detectSupport(event)){
         initModules();
-      }else{
-        location.hash = "unsupported";
-      }
+      // }else{
+      //   location.hash = "unsupported";
+      // }
     });
   }
 
@@ -71,11 +79,6 @@ app.main = (function(connection, calibration) {
       }
     }
   }
-
-  var init = function(){
-    console.log('Initializing app.');
-    socketSetup();
-  };
 
   return {
     init: init
