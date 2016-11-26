@@ -62,9 +62,8 @@ io.on('connection', function(socket) {
 
 
   // MOBILE
-  socket.on('add-mobile', function(data) {
+  socket.on('add-mobile', function(data, callback) {
     console.log('SOCKET: add-mobile');
-    console.log(data);
     addMobileUser(socket.id);
   });
 

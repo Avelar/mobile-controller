@@ -3,10 +3,7 @@ var app = app || {};
 app.main = (function() {
 
   var socket;
-  var canvas, context;
   var width, height;
-  var localUsers = {};
-  var pointer = document.querySelector("#pointer");  
 
   // Initializing socket and adding listener functions
   function socketSetup(){

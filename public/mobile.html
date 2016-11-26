@@ -16,7 +16,7 @@
       
       <section id="tpl-connection" class="hidden">
          <h1>Connection</h1>
-         <input id="key-input" type="number" min="4" max="4">
+         <input id="key-input" type="tel">
          <button id="match-bt">Go</button>
 
          <!-- WRONG KEY -->
@@ -55,10 +55,14 @@
          <!-- END DEBUG -->
       </section>
  
+      <!-- Socket -->
       <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+      <!-- Controllers -->
       <script type="text/javascript" src="js/controllers/mobile-connection.js"></script>
-      <!--<script type="text/javascript" src="js/mobile-calibration.js"></script>
-      <script type="text/javascript" src="js/mobile-controller.js"></script>-->
-      <script type="text/javascript" src="js/mobile-app.js"></script>      
+      <script type="text/javascript" src="js/controllers/mobile-calibration.js"></script>
+      <script type="text/javascript" src="js/controllers/mobile-controller.js"></script>
+      <!-- Mobile app -->
+      <script type="text/javascript" src="js/mobile-app.js"></script>
+
    </body>
 </html>

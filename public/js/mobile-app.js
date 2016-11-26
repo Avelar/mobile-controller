@@ -1,6 +1,6 @@
 var app = app || {};
 
-app.main = (function(connection) {
+app.main = (function(connection, calibration) {
 
   var socket;
   var body = document.querySelector("body");
@@ -16,7 +16,7 @@ app.main = (function(connection) {
     socket.on('welcome', function(data) { //when we get data from socket
       console.log(data.msg);
       console.log(data.users);
-      socket.emit('add-me', 'I\'m mobile!');
+      socket.emit('add-mobile');
     });
 
     attachEvents();
@@ -24,8 +24,19 @@ app.main = (function(connection) {
 
   function attachEvents(){
     window.addEventListener('hashchange', hashRouter);
+    // window.addEventListener('deviceorientation', detectSupport);
+    window.addEventListener('deviceorientation', function(){
+      if(detectSupport(event)){
+        initModules();
+      }else{
+        location.hash = "unsupported";
+      }
+    });
+  }
 
-    initModules();
+  function detectSupport(event){
+      // check if DeviceOrientationEvent is supported
+      return (event.alpha || event.beta || event.gamma) ? (true) : (false);
   }
 
   function initModules(){
@@ -47,6 +58,7 @@ app.main = (function(connection) {
     render("tpl-" + currentPage);
   }
 
+  // Render the section templates based hash change
   function render(section){
     console.log("render: " + section);
 
@@ -69,6 +81,6 @@ app.main = (function(connection) {
     init: init
   };
 
-})(connection); // Pass our external modules to the local scope
+})(connection, calibration); // Pass our external modules to the local scope
 
 window.addEventListener('DOMContentLoaded', app.main.init);
