@@ -104,36 +104,29 @@ io.on('connection', function(socket) {
     socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-bottom-right-confirmation", users[socket.id]["offset"]);
   });
 
-  // socket.on('calibrate', function(data) {
-  //   console.log('SOCKET: calibrate');
-  //   console.log(data);
-  //   calibrateMobileUser(socket.id, data);
-  // });
-
   // Listening for coordinates
   socket.on('orientation', function(data) {
-    console.log('SOCKET: orientation');
+    // console.log('SOCKET: orientation');
     // console.log('has sent: ' + socket.id, data);
-    updateUserPosition(socket.id, data);
-    users[socket.id]['isDrawing'] = data.isDrawing;
-    console.log(users[socket.id]['isDrawing']);
-    // io.sockets.emit('debug', data.orientation.events);
+    
+    users[socket.id]['isTouching'] = data.isTouching;
+
+    updateUserPosition(socket.id, data, function(){
+      socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-coordinates", {
+        pos: users[socket.id]["pos"],
+        isTouching: users[socket.id]['isTouching']
+      });
+    });
+    // console.log(users[socket.id]['isTouching']);
   });
   
   socket.on('disconnect', function() {
     console.log('SOCKET: disconnect');
     console.log(socket.id + ' just disconnected');
-    io.sockets.emit('global message', socket.id + ' just disconnected');
+    io.sockets.emit('to-all-user-disconnected', socket.id + ' just disconnected');
     removeUser(socket.id);
   });
 });
-
-function renderOnClient(){
-  // console.log('FUNCTION: renderOnClient');
-  // Emit coordinates to every clients (all players)
-  io.sockets.emit('render', users);
-}
-
 
 
 // MOBILE
@@ -152,6 +145,11 @@ function addMobileUser(id) {
             max: ""
           }
         },
+        pos: {
+          x: "",
+          y: ""
+        },
+        isTouching: false,
         partner: ""
       };
       console.log("New user:" + JSON.stringify(users[id]));
@@ -182,14 +180,8 @@ function calibrateMobileTopLeft(id, data){
   data["betaMax"] = fixAngle(data["betaMax"]);
   
   if(users.hasOwnProperty(id)){
-      users[id]['offset'] = {
-        x: {
-          min: data["alphaMin"]
-        },
-        y: {
-          max: data["betaMax"]
-        }
-      };
+    users[id]['offset'].x.min = data["alphaMin"];
+    users[id]['offset'].y.max = data["betaMax"];
     console.log(users[id]['offset']);
   }
 }
@@ -201,14 +193,8 @@ function calibrateMobileBottomRight(id, data){
   data["betaMin"] = fixAngle(data["betaMin"]);
   
   if(users.hasOwnProperty(id)){
-      users[id]['offset'] = {
-        x: {
-          max: data["alphaMax"]
-        },
-        y: {
-          min: data["betaMin"]
-        }
-      };
+    users[id]['offset'].x.max = data["alphaMax"];
+    users[id]['offset'].y.min = data["betaMin"];
     console.log(users[id]['offset']);
   }
     // if(Object.keys(users).length === 1){
@@ -239,7 +225,7 @@ function fixAngle(angle){
   return fixedAngle;
 }
 
-function updateUserPosition(id, data){
+function updateUserPosition(id, data, callback){
   // console.log('FUNCTION: updateUser');
   // console.log(data);
   if(users.hasOwnProperty(id)) {
@@ -249,15 +235,20 @@ function updateUserPosition(id, data){
     angleToPosition(id, data.orientation.x, "x");
     angleToPosition(id, data.orientation.y, "y");
 
-    renderOnClient();
+    callback();
   }
 }
 
 function angleToPosition(id, angle, axis){
+  
   angle = fixAngle(angle);
+
   // Clamping
   if(angle > users[id]['offset'][axis]["min"]) angle = users[id]['offset'][axis]["min"];
   if(angle < users[id]['offset'][axis]["max"]) angle = users[id]['offset'][axis]["max"];
+
+  var partner = users[id]["partner"];
+  var dimensions = users[partner]["dimensions"];
 
   if(axis === "x"){
     users[id]['pos'][axis] = map(angle,
@@ -269,8 +260,6 @@ function angleToPosition(id, angle, axis){
                             dimensions[axis], 0); // y is inverted :/
   }
   users[id]['pos'][axis] = Math.round(users[id]['pos'][axis]);
-  
-  // console.log(axis, users[id]['pos'][axis]);
 }
 
 

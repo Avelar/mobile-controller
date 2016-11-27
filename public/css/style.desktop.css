@@ -15,3 +15,11 @@ body, html, section {
 .hidden {
    display: none;
 }
+
+#pointer{
+	width: 40px;
+	height: 40px;
+	border: 20px;
+	position: absolute;
+	background: red;
+}

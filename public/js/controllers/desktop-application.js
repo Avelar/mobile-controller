@@ -18,7 +18,7 @@ var application = (function(){
 
   }
 
-  return obj;	
+  return obj;
 })();
 // var app = app || {};
 

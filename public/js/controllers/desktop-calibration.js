@@ -20,6 +20,10 @@ var calibration = (function(){
       console.log(data);
       renderInstructions("do-done");
     });
+    socket.on('to-desktop-coordinates', function(data) {
+      console.log(data);
+      movePointer(data);
+    });
 
     attachEvents();
   }
@@ -46,6 +50,11 @@ var calibration = (function(){
   function resetCalibration(){
     socket.emit("from-desktop-reset-calibration");
     renderInstructions("do-top-left");
+  }
+
+  function movePointer(data){
+    pointer.style["top"] = data["pos"].y + "px";
+    pointer.style["left"] = data["pos"].x + "px";
   }
 
   return obj;

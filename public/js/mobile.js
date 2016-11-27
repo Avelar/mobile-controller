@@ -30,6 +30,10 @@ app.main = (function(connection, calibration, application) {
       console.log(data.users);
       attachEvents();
     });
+
+    socket.on('to-all-user-disconnected', function(data){
+      console.log(data);
+    });
   }
 
   function attachEvents(){
