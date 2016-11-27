@@ -1,3 +1,26 @@
+var application = (function(){
+
+  console.log("Loaded module: application");
+
+  var obj = {};             // This module
+  var socket, controller;   // Shared across modules
+
+  obj.init = function(_socket, _controller){
+    socket = _socket;
+    controller = _controller;
+    socketSetup();
+  };
+
+  function socketSetup(){
+	attachEvents();
+  }
+
+  function attachEvents(){
+
+  }
+
+  return obj;
+})();
 // var app = app || {};
 
 // app.main = (function() {

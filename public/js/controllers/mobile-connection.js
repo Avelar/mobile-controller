@@ -2,11 +2,12 @@ var connection = (function(){
 
   console.log("Loaded module: connection");
   
-  var obj = {};
-  var socket;
+  var obj = {};             // This module
+  var socket, controller;   // Shared across modules
 
-  obj.init = function(_socket){
+  obj.init = function(_socket, _controller){
     socket = _socket;
+    controller = _controller;
     socketSetup();
   };
 
@@ -41,6 +42,7 @@ var connection = (function(){
 
     socket.emit("from-mobile-match-key", key, function(data){
       console.log(data);
+      controller["isConnected"] = true;
       if(data === "right-key"){
         location.hash = "calibration";
       }else{

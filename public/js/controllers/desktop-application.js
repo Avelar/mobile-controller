@@ -1,3 +1,25 @@
+var application = (function(){
+  console.log("Loaded module: calibration");
+  
+  var obj = {};             // This module
+  var socket;               // Shared across modules
+
+  obj.init = function(_socket){
+    socket = _socket;
+    socketSetup();
+  };
+
+  function socketSetup(){
+
+    attachEvents();
+  }
+
+  function attachEvents(){
+
+  }
+
+  return obj;	
+})();
 // var app = app || {};
 
 // app.main = (function() {

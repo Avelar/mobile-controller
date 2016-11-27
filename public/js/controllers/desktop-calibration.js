@@ -2,9 +2,8 @@ var calibration = (function(){
 
   console.log("Loaded module: calibration");
   
-  var obj = {};
-  var socket;
-  var touches = 0;
+  var obj = {};             // This module
+  var socket;               // Shared across modules
 
   obj.init = function(_socket){
     socket = _socket;
@@ -31,8 +30,8 @@ var calibration = (function(){
 
     var continueBt = document.querySelector("#continue-bt");
     continueBt.addEventListener("click", function(){
-      location.hash = "controller";
-      socket.emit("from-desktop-start-controller");
+      location.hash = "application";
+      socket.emit("from-desktop-start-application");
     });
   }
 

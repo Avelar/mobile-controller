@@ -16,15 +16,14 @@ app.use('*', function(req, res) {
   // console.log(req.headers['user-agent']);
   // Say if req.headers['user-agent'] contains "Mobile", re-route the user to mobile interface
   var ua = req.headers['user-agent'];
-  res.redirect('mobile.html');
-  // if (ua.indexOf('Mobile') > -1) {
-  //   console.log('User is using mobile device');
-  //   res.redirect('mobile.html');
-  // } else {
-  //   // Else display a desktop version
-  //   console.log('User is using desktop device');
-  //   res.redirect('desktop.html');
-  // }
+  if (ua.indexOf('Mobile') > -1) {
+    console.log('User is using mobile device');
+    res.redirect('mobile.html');
+  } else {
+    // Else display a desktop version
+    console.log('User is using desktop device');
+    res.redirect('desktop.html');
+  }
 });
 
 server.listen(PORT, function(){
@@ -66,9 +65,9 @@ io.on('connection', function(socket) {
     socket.broadcast.to(users[socket.id]["partner"]).emit("to-mobile-reset-calibration");
   });
 
-  socket.on("from-desktop-start-controller", function(){
-    console.log("SOCKET: from-desktop-start-controller");
-    socket.broadcast.to(users[socket.id]["partner"]).emit("to-mobile-start-controller");
+  socket.on("from-desktop-start-application", function(){
+    console.log("SOCKET: from-desktop-start-application");
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-mobile-start-application");
   });
 
 

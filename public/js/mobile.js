@@ -1,11 +1,20 @@
 var app = app || {};
 
-app.main = (function(connection, calibration) {
+app.main = (function(connection, calibration, application) {
 
   var socket;
+  var controller = {
+    isConnected: false,
+    isCalibrated: false,
+    orientation: {
+      x: "",
+      y: ""
+    }
+  };
 
   function init(){
     console.log('Initializing app.');
+    if(!controller["isConnected"]) location.hash = "";
     socketSetup();
   }
 
@@ -38,8 +47,8 @@ app.main = (function(connection, calibration) {
 
     // We have to send the local socket object to the external modules,
     // so that they can communicate with the server
-    connection.init(socket);
-    calibration.init(socket);
+    connection.init(socket, controller);
+    calibration.init(socket, controller);
 
     // Now let's call our first "page", connection
     location.hash = "connection";
@@ -70,6 +79,6 @@ app.main = (function(connection, calibration) {
     init: init
   };
 
-})(connection, calibration); // Pass our external modules to the local scope
+})(connection, calibration, application); // Pass our external modules to the local scope
 
 window.addEventListener('DOMContentLoaded', app.main.init);

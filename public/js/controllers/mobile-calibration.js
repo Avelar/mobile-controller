@@ -1,16 +1,16 @@
 var calibration = (function(){
 
   console.log("Loaded module: calibration");
-  
-  var obj = {};
 
-  var socket;
-  var debug = false;
-  var orientation = {};
+  var obj = {};             // This module
+  var socket, controller;   // Shared across modules
+
+  var debug = false;        // Local to this module
   var touches = 0;
 
-  obj.init = function(_socket){
+  obj.init = function(_socket, _controller){
     socket = _socket;
+    controller = _controller;
     socketSetup();
   };
 
@@ -19,16 +19,16 @@ var calibration = (function(){
       touches = 0;
       document.getElementById("calibrate-msg").innerHTML = "TOP-LEFT";
     });
-    socket.on("to-mobile-start-controller", function(){
-      location.hash = "controller";
-    });    
+    socket.on("to-mobile-start-application", function(){
+      location.hash = "application";
+    });
     attachEvents();
   }
 
   function attachEvents(){
     //listen for event and handle DeviceOrientationEvent object
     window.addEventListener('deviceorientation', function(event) {
-        orientation = getOrientation(event);
+        controller["orientation"] = getOrientation(event);
         // if(isCalibrated) emitOrientation();
         if(debug) displayOrientation(event);
     });
@@ -51,8 +51,8 @@ var calibration = (function(){
       if(touches === 1) {
         
         data = {
-          alphaMin: orientation.x,
-          betaMax: orientation.y
+          alphaMin: controller["orientation"].x,
+          betaMax: controller["orientation"].y
         };
         socket.emit('from-mobile-calibrate-top-left', data);
         msg.innerHTML = "BOTTOM-RIGHT";
@@ -60,8 +60,8 @@ var calibration = (function(){
       }else if(touches === 2) {
 
         data = {
-          alphaMax: orientation.x,
-          betaMin: orientation.y
+          alphaMax: controller["orientation"].x,
+          betaMin: controller["orientation"].y
         };
         socket.emit('from-mobile-calibrate-bottom-right', data);
         msg.innerHTML = "CALIBRATED";

@@ -2,8 +2,8 @@ var connection = (function(){
 
   console.log("Loaded module: connection");
   
-  var obj = {};
-  var socket;
+  var obj = {};             // This module
+  var socket;               // Shared across modules
 
   obj.init = function(_socket){
     console.log("init");
