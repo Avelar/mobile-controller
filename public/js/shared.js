@@ -5,7 +5,7 @@ var shared = (function(){
     var currentPage;
 
     //Let's create some redirects just to make sure the user won't skip any step
-    if(localStorage["isConnected"]){
+    if(!localStorage["isConnected"]){
       location.hash = "connection";
     }else if(!localStorage["isCalibrated"]){
       location.hash = "calibration";

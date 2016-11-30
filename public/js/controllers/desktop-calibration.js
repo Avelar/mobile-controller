@@ -7,6 +7,7 @@ var calibration = (function(){
 
   obj.init = function(_socket){
     socket = _socket;
+    renderInstructions("do-top-left");
     socketSetup();
   };
 

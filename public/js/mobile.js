@@ -41,6 +41,7 @@ app.main = (function(shared, connection, calibration, application) {
   }
 
   function attachEvents(){
+    window.removeEventListener('hashchange', shared.hashRouter);
     window.addEventListener('hashchange', shared.hashRouter);
     // if(window.DeviceOrientationEvent){
       initModules();

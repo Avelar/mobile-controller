@@ -27,11 +27,12 @@ var calibration = (function(){
 
   function attachEvents(){
     //listen for event and handle DeviceOrientationEvent object
-    window.addEventListener('deviceorientation', function(event) {
-        controller["orientation"] = getOrientation(event);
-        if(localStorage["isCalibrated"]){ emitOrientation() };
-        if(debug) displayOrientation(event);
-    });
+    window.removeEventListener('deviceorientation', getOrientation);
+    window.removeEventListener('deviceorientation', emitOrientation);
+    window.removeEventListener('deviceorientation', displayOrientation);
+
+    window.addEventListener('deviceorientation', getOrientation);
+    if(debug) window.removeEventListener('deviceorientation', displayOrientation);
 
     var calibrateBt = document.querySelector("#calibrate-bt");
     calibrateBt.removeEventListener("click", calibrate);
@@ -80,6 +81,8 @@ var calibration = (function(){
         controller["isCalibrated"] = true;        
         document.querySelector("#calibrate-bt").classList.add("hidden");
         document.querySelector("#hit-bt").classList.remove("hidden");
+        
+        window.addEventListener('deviceorientation', getOrientation);        
       }
     }
   }
@@ -97,7 +100,7 @@ var calibration = (function(){
   function getOrientation(){
     var tiltFrontToBack = event.beta;
     var direction = event.alpha;
-    return {
+    controller["orientation"] = {
       x: direction, y: -tiltFrontToBack
     };
   }

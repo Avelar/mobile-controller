@@ -16,14 +16,15 @@ app.use('*', function(req, res) {
   // console.log(req.headers['user-agent']);
   // Say if req.headers['user-agent'] contains "Mobile", re-route the user to mobile interface
   var ua = req.headers['user-agent'];
-  if (ua.indexOf('Mobile') > -1) {
-    console.log('User is using mobile device');
+  
+  // if (ua.indexOf('Mobile') > -1) {
+  //   console.log('User is using mobile device');
     res.redirect('mobile.html');
-  } else {
-    // Else display a desktop version
-    console.log('User is using desktop device');
-    res.redirect('desktop.html');
-  }
+  // } else {
+  //   // Else display a desktop version
+  //   console.log('User is using desktop device');
+  //   res.redirect('desktop.html');
+  // }
 });
 
 server.listen(PORT, function(){
@@ -106,7 +107,7 @@ io.on('connection', function(socket) {
 
   // Listening for coordinates
   socket.on('orientation', function(data) {
-    // console.log('SOCKET: orientation');
+    console.log('SOCKET: orientation');
     // console.log('has sent: ' + socket.id, data);
     
     users[socket.id]['isTouching'] = data.isTouching;
@@ -124,9 +125,10 @@ io.on('connection', function(socket) {
     console.log('SOCKET: disconnect');
     console.log(socket.id + ' just disconnected');
     // io.sockets.emit('to-all-user-disconnected', socket.id + ' just disconnected');
-    removeUser(socket.id, function(partner){
-      socket.broadcast.to(users[partner]).emit("to-all-partner-disconnected"); 
-    });
+    // Let's disconnect the partner first
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-all-partner-disconnected");
+    // Now remove the user from our list
+    removeUser(socket.id);
   });
 });
 
@@ -228,7 +230,7 @@ function fixAngle(angle){
 }
 
 function updateUserPosition(id, data, callback){
-  // console.log('FUNCTION: updateUser');
+  console.log('FUNCTION: updateUserPosition');
   // console.log(data);
   if(users.hasOwnProperty(id)) {
     // console.log('in:\t' + data.orientation.x);
