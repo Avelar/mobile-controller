@@ -18,6 +18,7 @@ var calibration = (function(){
     });
     socket.on("to-desktop-bottom-right-confirmation", function(data) {
       console.log(data);
+      localStorage["isCalibrated"] = true;
       renderInstructions("do-done");
     });
     socket.on('to-desktop-coordinates', function(data) {

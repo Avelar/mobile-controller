@@ -42,7 +42,7 @@ var connection = (function(){
 
     socket.emit("from-mobile-match-key", key, function(data){
       console.log(data);
-      controller["isConnected"] = true;
+      localStorage["isConnected"] = true;
       if(data === "right-key"){
         location.hash = "calibration";
       }else{

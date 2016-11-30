@@ -29,7 +29,7 @@ var calibration = (function(){
     //listen for event and handle DeviceOrientationEvent object
     window.addEventListener('deviceorientation', function(event) {
         controller["orientation"] = getOrientation(event);
-        if(controller["isCalibrated"]){ emitOrientation() };
+        if(localStorage["isCalibrated"]){ emitOrientation() };
         if(debug) displayOrientation(event);
     });
 

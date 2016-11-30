@@ -123,8 +123,10 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {
     console.log('SOCKET: disconnect');
     console.log(socket.id + ' just disconnected');
-    io.sockets.emit('to-all-user-disconnected', socket.id + ' just disconnected');
-    removeUser(socket.id);
+    // io.sockets.emit('to-all-user-disconnected', socket.id + ' just disconnected');
+    removeUser(socket.id, function(partner){
+      socket.broadcast.to(users[partner]).emit("to-all-partner-disconnected"); 
+    });
   });
 });
 

@@ -1,11 +1,14 @@
 var app = app || {};
 
-app.main = (function(connection, calibration, application) {
+app.main = (function(shared, connection, calibration, application) {
 
   var socket;
+  localStorage["isConnected"] = false;
+  localStorage["isCalibrated"] = false;
 
   function init(){
     console.log('Initializing app.');
+    location.hash = "";
     socketSetup();
   }
 
@@ -21,13 +24,17 @@ app.main = (function(connection, calibration, application) {
       attachEvents();
     });
     
-    socket.on('to-all-user-disconnected', function(data){
+    // socket.on('to-all-user-disconnected', function(data){
+    //   console.log(data);
+    // });
+    socket.on('to-all-partner-disconnected', function(data){
       console.log(data);
-    });    
+      shared.disconnect();
+    });
   }
 
   function attachEvents(){
-    window.addEventListener('hashchange', hashRouter);
+    window.addEventListener('hashchange', shared.hashRouter);
     initModules();
   }
 
@@ -39,28 +46,10 @@ app.main = (function(connection, calibration, application) {
     location.hash = "connection";
   }
 
-  function hashRouter(){
-    var currentPage = location.hash.substring(1, location.hash.length);
-    console.log('Current hash is ' + currentPage);
-    render("tpl-" + currentPage);
-  }
-
-  function render(section){
-    console.log("render: " + section);
-    var sections = document.getElementsByTagName("section");
-    for(var i = 0; i < sections.length; i++){
-      if(sections[i].id === section){
-        sections[i].classList.remove("hidden");
-      }else{
-        sections[i].classList.add("hidden");
-      }
-    }
-  }
-
   return {
     init: init
   };
 
-})(connection, calibration, application);
+})(shared, connection, calibration, application);
 
 window.addEventListener('DOMContentLoaded', app.main.init);

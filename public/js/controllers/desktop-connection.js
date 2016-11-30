@@ -26,6 +26,7 @@ var connection = (function(){
 
     socket.on('to-desktop-confirm-connection', function(data) {
       console.log(data);
+      localStorage["isConnected"] = true;
       location.hash = "calibration";
     });
 
