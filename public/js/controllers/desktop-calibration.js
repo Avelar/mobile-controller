@@ -59,7 +59,7 @@ var calibration = (function(){
   function resetCalibration(){
     localStorage["isCalibrated"] = 0;    
     main.socket.emit("from-desktop-reset-calibration");
-    renderInstructions("do-top-left");
+    renderInstructions("do-center");
   }
 
   function movePointer(data){

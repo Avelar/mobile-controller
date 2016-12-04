@@ -37,10 +37,11 @@ var calibration = (function(){
   function attachEvents(){
     //listen for event and handle DeviceOrientationEvent object
     window.removeEventListener('deviceorientation', getOrientation);
-    window.removeEventListener('deviceorientation', emitOrientation);
+    window.removeEventListener('deviceorientation', main.controller.emitOrientation);
     window.removeEventListener('deviceorientation', displayOrientation);
 
     window.addEventListener('deviceorientation', getOrientation);
+    window.addEventListener('deviceorientation', main.controller.emitOrientation);
     if(debug) window.removeEventListener('deviceorientation', displayOrientation);
 
     var calibrateBt = document.querySelector("#calibrate-bt");
@@ -53,15 +54,6 @@ var calibration = (function(){
     hitBt.addEventListener('touchcancel', handleEnd, false);
   }
 
-  function resetCalibration(){
-    touches = 0;
-    localStorage["isCalibrated"] = 0;
-    window.removeEventListener('deviceorientation', emitOrientation);
-    document.getElementById("calibrate-msg").innerHTML = "CENTER";
-    document.querySelector("#calibrate-bt").classList.remove("hidden");
-    document.querySelector("#hit-bt").classList.add("hidden");
-  }
-
   function calibrate(){
     
     var data, msg;
@@ -72,7 +64,7 @@ var calibration = (function(){
       msg = document.getElementById("calibrate-msg");
 
       if(touches === 1) {
-        main.socket.emit('from-mobile-calibrate-center', data);
+        main.socket.emit('from-mobile-calibrate-center', "User aimed at center");
         msg.innerHTML = "TOP-LEFT";
        
       }else if(touches === 2) {
@@ -94,11 +86,17 @@ var calibration = (function(){
         localStorage["isCalibrated"] = true;        
         document.querySelector("#calibrate-bt").classList.add("hidden");
         document.querySelector("#hit-bt").classList.remove("hidden");
-        
-        window.addEventListener('deviceorientation', emitOrientation);        
       }
     }
   }
+
+  function resetCalibration(){
+    touches = 0;
+    localStorage["isCalibrated"] = 0;
+    document.getElementById("calibrate-msg").innerHTML = "CENTER";
+    document.querySelector("#calibrate-bt").classList.remove("hidden");
+    document.querySelector("#hit-bt").classList.add("hidden");
+  }  
 
   function handleStart(event) {
     event.preventDefault();
@@ -117,14 +115,6 @@ var calibration = (function(){
       x: direction,
       y: -tiltFrontToBack
     };
-  }
-
-  function emitOrientation(){
-    main.socket.emit('orientation', {
-      orientation: main.controller["orientation"],
-      isTouching: isTouching
-    });
-    if(isTouching) isTouching = false;
   }
 
   // DEBUG: use this to check if the gyroscope and magnetometer are working correctly

@@ -17,14 +17,14 @@ app.use('*', function(req, res) {
   // Say if req.headers['user-agent'] contains "Mobile", re-route the user to mobile interface
   var ua = req.headers['user-agent'];
   
-  if (ua.indexOf('Mobile') > -1) {
-    console.log('User is using mobile device');
-    res.redirect('mobile.html');
-  } else {
-    // Else display a desktop version
-    console.log('User is using desktop device');
-    res.redirect('desktop.html');
-  }
+  // if (ua.indexOf('Mobile') > -1) {
+  //   console.log('User is using mobile device');
+  //   res.redirect('mobile.html');
+  // } else {
+  //   // Else display a desktop version
+  //   console.log('User is using desktop device');
+  //   res.redirect('desktop.html');
+  // }
 });
 
 server.listen(PORT, function(){
@@ -91,10 +91,10 @@ io.on('connection', function(socket) {
     });
   });
 
-  socket.on("from-mobile-calibrate-top-left", function(data){
+  socket.on("from-mobile-calibrate-center", function(msg){
     console.log("SOCKET: from-mobile-calibrate-center");
-    console.log(data);
-    socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-center-confirmation", "User aimed at center");
+    console.log(msg);
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-center-confirmation", msg);
   });
 
   socket.on("from-mobile-calibrate-top-left", function(data){

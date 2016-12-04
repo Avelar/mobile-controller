@@ -8,7 +8,9 @@ app.main = (function(shared, connection, calibration, application) {
     orientation: {
       x: "",
       y: ""
-    }
+    },
+    isTouching: false,
+    emitOrientation: emitOrientation
   };
 
   obj.init = function(){
@@ -34,7 +36,7 @@ app.main = (function(shared, connection, calibration, application) {
       attachEvents();
       // Sending main app (obj) to shared, so modules can have access to global vars (socket & controller)
       // Sending the modules too, so they can be executed on hash change
-      shared.setModules(obj, {connection, calibration, application});      
+      shared.setModules(obj, {connection, calibration, application});
     });
 
     obj.socket.on('to-all-user-disconnected', function(data){
@@ -48,14 +50,28 @@ app.main = (function(shared, connection, calibration, application) {
   }
 
   function attachEvents(){
+
+    // Let's remove all window event listeners that may have been added in further steps
     window.removeEventListener('hashchange', shared.hashRouter);
+    window.removeEventListener('deviceorientation', obj.controller.emitOrientation);
+
+    // Now adding hash router    
     window.addEventListener('hashchange', shared.hashRouter);
-    if(window.DeviceOrientationEvent){
+
+    // if(window.DeviceOrientationEvent){
       location.hash = "connection";
-    }else{
-      location.hash = "unsupported";
-    }
+    // }else{
+    //   location.hash = "unsupported";
+    // }
   }
+
+  function emitOrientation(){
+    obj.socket.emit('orientation', {
+      orientation: obj.controller["orientation"],
+      isTouching: obj.controller["isTouching"]
+    });
+    if(obj.controller["isTouching"]) obj.controller["isTouching"] = false;
+  };
 
   return obj;
 
