@@ -71,13 +71,13 @@ var calibration = (function(){
   }
 
   // DEBUG: use this to check if the gyroscope and magnetometer are working correctly
-  function displayOrientation(){
+  function displayOrientation(data){
     
     document.querySelector("#do-results").classList.remove("hidden");
 
-    var tiltLeftToRight = event.gamma;  // left-to-right tilt in degrees, where right is positive
-    var tiltFrontToBack = event.beta;   // front-to-back tilt in degrees, where front is positive
-    var direction = event.alpha;        // compass direction the device is facing in degrees
+    var tiltLeftToRight = data.gamma;  // left-to-right tilt in degrees, where right is positive
+    var tiltFrontToBack = data.beta;   // front-to-back tilt in degrees, where front is positive
+    var direction = data.alpha;        // compass direction the device is facing in degrees
 
     // rotate image using CSS3 transform
     var cube = document.getElementById('cube');

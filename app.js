@@ -114,7 +114,7 @@ io.on('connection', function(socket) {
   // Listening for coordinates
   socket.on('orientation', function(data) {
     console.log('SOCKET: orientation');
-    // console.log('has sent: ' + socket.id, data);
+    console.log('has sent: ' + socket.id, data);
     
     if(users.hasOwnProperty(socket.id)){
       users[socket.id]['isTouching'] = data.isTouching;
@@ -192,8 +192,8 @@ function matchMobileUser(id, key, callback){
 function calibrateMobileTopLeft(id, data){
   console.log('FUNCTION: calibrateMobileTopLeft');
 
-  data["alphaMin"] = fixAngle(data["alphaMin"]);
-  data["betaMax"] = fixAngle(data["betaMax"]);
+  data["alphaMin"] = fixAngle(data.orientation.direction);
+  data["betaMax"] = fixAngle(-data.orientation.tiltFrontToBack);
   
   if(users.hasOwnProperty(id)){
     users[id]['offset'].x.min = data["alphaMin"];
@@ -205,8 +205,8 @@ function calibrateMobileTopLeft(id, data){
 function calibrateMobileBottomRight(id, data){
   console.log('FUNCTION: calibrateMobileBottomRight');
 
-  data["alphaMax"] = fixAngle(data["alphaMax"]);
-  data["betaMin"] = fixAngle(data["betaMin"]);
+  data["alphaMax"] = fixAngle(data.orientation.direction);
+  data["betaMin"] = fixAngle(-data.orientation.tiltFrontToBack);  
   
   if(users.hasOwnProperty(id)){
     users[id]['offset'].x.max = data["alphaMax"];
@@ -246,10 +246,10 @@ function updateUserPosition(id, data, callback){
   // console.log(data);
   if(users.hasOwnProperty(id)) {
     // console.log('in:\t' + data.orientation.x);
-    // console.log('in:\t' + data.orientation.y);
+    // console.log('in:\t' + data.orientation.y);    
 
-    angleToPosition(id, data.orientation.x, "x");
-    angleToPosition(id, data.orientation.y, "y");
+    angleToPosition(id, data.orientation.direction, "x");
+    angleToPosition(id, -data.orientation.tiltFrontToBack, "y");
 
     callback();
   }

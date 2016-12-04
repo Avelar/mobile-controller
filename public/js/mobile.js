@@ -6,8 +6,9 @@ app.main = (function(shared, connection, calibration, application) {
   obj.socket = {};
   obj.controller = {
     orientation: {
-      x: "",
-      y: ""
+      tiltLeftToRight: "",
+      tiltFrontToBack: "",
+      direction: ""
     },
     isTouching: false,
     emitOrientation: emitOrientation
@@ -65,13 +66,30 @@ app.main = (function(shared, connection, calibration, application) {
     // }
   }
 
-  function emitOrientation(){
+  function handleStart(event) {
+    event.preventDefault();
+    obj.controller["isTouching"] = true;
+  }
+
+  function handleEnd(event) {
+    event.preventDefault();
+    obj.controller["isTouching"] = false;
+  }
+
+  function emitOrientation(event){
+    obj.controller["orientation"] = {
+      tiltLeftToRight: event.gamma,  // left-to-right tilt in degrees, where right is positive
+      tiltFrontToBack: event.beta,   // front-to-back tilt in degrees, where front is positive
+      direction: event.alpha         // compass direction the device is facing in degrees    
+    };
+
     obj.socket.emit('orientation', {
       orientation: obj.controller["orientation"],
       isTouching: obj.controller["isTouching"]
     });
-    if(obj.controller["isTouching"]) obj.controller["isTouching"] = false;
-  };
+
+    if(obj.controller["isTouching"]) obj.controller["isTouching"] = false;    
+  }
 
   return obj;
 

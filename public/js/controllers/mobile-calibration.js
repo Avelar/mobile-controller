@@ -12,7 +12,7 @@ var calibration = (function(){
   obj.init = function(){
     console.log("init calibration");
 
-    debug = false;
+    debug = true;
     touches = 0;
     isTouching = false;
 
@@ -36,22 +36,20 @@ var calibration = (function(){
 
   function attachEvents(){
     //listen for event and handle DeviceOrientationEvent object
-    window.removeEventListener('deviceorientation', getOrientation);
     window.removeEventListener('deviceorientation', main.controller.emitOrientation);
     window.removeEventListener('deviceorientation', displayOrientation);
 
-    window.addEventListener('deviceorientation', getOrientation);
     window.addEventListener('deviceorientation', main.controller.emitOrientation);
-    if(debug) window.removeEventListener('deviceorientation', displayOrientation);
+    if(debug) window.addEventListener('deviceorientation', displayOrientation);
 
     var calibrateBt = document.querySelector("#calibrate-bt");
     calibrateBt.removeEventListener("click", calibrate);
     calibrateBt.addEventListener("click", calibrate);
 
-    var hitBt = document.querySelector('#hit-bt');
-    hitBt.addEventListener('touchstart', handleStart, false);
-    hitBt.addEventListener('touchend', handleEnd, false);
-    hitBt.addEventListener('touchcancel', handleEnd, false);
+    // var hitBt = document.querySelector('#hit-bt');
+    // hitBt.addEventListener('touchstart', handleStart, false);
+    // hitBt.addEventListener('touchend', handleEnd, false);
+    // hitBt.addEventListener('touchcancel', handleEnd, false);
   }
 
   function calibrate(){
@@ -69,20 +67,22 @@ var calibration = (function(){
        
       }else if(touches === 2) {
         
-        data = {
-          alphaMin: main.controller["orientation"].x,
-          betaMax: main.controller["orientation"].y
-        };
-        main.socket.emit('from-mobile-calibrate-top-left', data);
+        // data = {
+        //   alphaMin: main.controller["orientation"].x,
+        //   betaMax: main.controller["orientation"].y
+        // };
+        // main.socket.emit('from-mobile-calibrate-top-left', data);
+        main.socket.emit('from-mobile-calibrate-top-left', {orientation: main.controller.orientation});
         msg.innerHTML = "BOTTOM-RIGHT";
 
       }else if(touches === 3) {
 
-        data = {
-          alphaMax: main.controller["orientation"].x,
-          betaMin: main.controller["orientation"].y
-        };
-        main.socket.emit('from-mobile-calibrate-bottom-right', data);
+        // data = {
+        //   alphaMax: main.controller["orientation"].x,
+        //   betaMin: main.controller["orientation"].y
+        // };
+        // main.socket.emit('from-mobile-calibrate-bottom-right', data);
+        main.socket.emit('from-mobile-calibrate-bottom-right', {orientation: main.controller.orientation});
         localStorage["isCalibrated"] = true;        
         document.querySelector("#calibrate-bt").classList.add("hidden");
         document.querySelector("#hit-bt").classList.remove("hidden");
@@ -96,25 +96,6 @@ var calibration = (function(){
     document.getElementById("calibrate-msg").innerHTML = "CENTER";
     document.querySelector("#calibrate-bt").classList.remove("hidden");
     document.querySelector("#hit-bt").classList.add("hidden");
-  }  
-
-  function handleStart(event) {
-    event.preventDefault();
-    isTouching = true;
-  }
-
-  function handleEnd(event) {
-    event.preventDefault();
-    isTouching = false;
-  }
-
-  function getOrientation(){
-    var tiltFrontToBack = event.beta;
-    var direction = event.alpha;
-    main.controller["orientation"] = {
-      x: direction,
-      y: -tiltFrontToBack
-    };
   }
 
   // DEBUG: use this to check if the gyroscope and magnetometer are working correctly
@@ -122,9 +103,9 @@ var calibration = (function(){
     
     document.querySelector("#do-results").classList.remove("hidden");
 
-    var tiltLeftToRight = event.gamma;  // left-to-right tilt in degrees, where right is positive
-    var tiltFrontToBack = event.beta;   // front-to-back tilt in degrees, where front is positive
-    var direction = event.alpha;        // compass direction the device is facing in degrees
+    var tiltLeftToRight = main.controller.orientation.tiltLeftToRight;  // left-to-right tilt in degrees, where right is positive
+    var tiltFrontToBack = main.controller.orientation.tiltFrontToBack;  // front-to-back tilt in degrees, where front is positive
+    var direction = main.controller.orientation.direction;              // compass direction the device is facing in degrees
 
     // rotate image using CSS3 transform
     var cube = document.getElementById('cube');
