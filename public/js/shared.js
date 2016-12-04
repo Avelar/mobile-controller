@@ -19,10 +19,11 @@ var shared = (function(){
   function hashRouter(){
     var currentPage;
 
-    //Let's create some redirects just to make sure the user won't skip any step
-    if(!localStorage["isConnected"]){
+    // Let's create some redirects just to make sure the user won't skip any step
+    if(localStorage["isConnected"] == 0){
       location.hash = "connection";
-    }else if(!localStorage["isCalibrated"]){
+      console.log("hey");
+    }else if(localStorage["isCalibrated"] == 0){
       location.hash = "calibration";
     }
 
@@ -50,8 +51,8 @@ var shared = (function(){
 
   // Called when user lands on "page"
   function initModule(section){
-    console.log(section);
-    console.log(modules);
+    // console.log(section);
+    // console.log(modules);
     modules[section].init();
   }
 

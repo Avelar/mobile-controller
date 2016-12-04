@@ -124,9 +124,11 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {
     console.log('SOCKET: disconnect');
     console.log(socket.id + ' just disconnected');
-    // io.sockets.emit('to-all-user-disconnected', socket.id + ' just disconnected');
+    io.sockets.emit('to-all-user-disconnected', socket.id + ' just disconnected');
     // Let's disconnect the partner first
-    socket.broadcast.to(users[socket.id]["partner"]).emit("to-all-partner-disconnected");
+    if(users.hasOwnProperty(socket.id) && users[socket.id]["partner"] !== ""){
+      socket.broadcast.to(users[socket.id]["partner"]).emit("to-all-partner-disconnected");
+    }
     // Now remove the user from our list
     removeUser(socket.id);
   });

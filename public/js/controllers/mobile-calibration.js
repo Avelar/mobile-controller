@@ -50,7 +50,7 @@ var calibration = (function(){
 
   function resetCalibration(){
     touches = 0;
-    main.controller["isCalibrated"] = false;
+    localStorage["isCalibrated"] = 0;
     document.getElementById("calibrate-msg").innerHTML = "TOP-LEFT";
     document.querySelector("#calibrate-bt").classList.remove("hidden");
     document.querySelector("#hit-bt").classList.add("hidden");
@@ -63,7 +63,6 @@ var calibration = (function(){
     // 0: not calibrated; 1: top-left, 2: bottom-right
     if(touches < 2){
       touches ++;
-      // isCalibrated = false;
       msg = document.getElementById("calibrate-msg");
        
       if(touches === 1) {
@@ -82,7 +81,7 @@ var calibration = (function(){
           betaMin: main.controller["orientation"].y
         };
         main.socket.emit('from-mobile-calibrate-bottom-right', data);
-        main.controller["isCalibrated"] = true;        
+        localStorage["isCalibrated"] = true;        
         document.querySelector("#calibrate-bt").classList.add("hidden");
         document.querySelector("#hit-bt").classList.remove("hidden");
         

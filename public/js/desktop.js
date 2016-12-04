@@ -9,8 +9,8 @@ app.main = (function(shared, connection, calibration, application) {
     console.log('Initializing app.');
 
     location.hash = "";
-    localStorage["isConnected"] = false;
-    localStorage["isCalibrated"] = false;
+    localStorage["isConnected"] = 0;
+    localStorage["isCalibrated"] = 0;
 
     initSocket();
   };
@@ -31,9 +31,10 @@ app.main = (function(shared, connection, calibration, application) {
       shared.setModules(obj, {connection, calibration, application});
     });
     
-    // obj.socket.on('to-all-user-disconnected', function(data){
-    //   console.log(data);
-    // });
+    obj.socket.on('to-all-user-disconnected', function(data){
+      console.log(data);
+    });
+
     obj.socket.on('to-all-partner-disconnected', function(data){
       console.log(data);
       shared.disconnect();

@@ -30,7 +30,7 @@ var connection = (function(){
 
     main.socket.on('to-desktop-confirm-connection', function(data) {
       console.log(data);
-      localStorage["isConnected"] = true;
+      localStorage["isConnected"] = 1;
       location.hash = "calibration";
     });
   }

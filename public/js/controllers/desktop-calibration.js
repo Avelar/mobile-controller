@@ -24,7 +24,7 @@ var calibration = (function(){
     });
     main.socket.on("to-desktop-bottom-right-confirmation", function(data) {
       console.log(data);
-      localStorage["isCalibrated"] = true;
+      localStorage["isCalibrated"] = 1;
       renderInstructions("do-done");
     });
     main.socket.on('to-desktop-coordinates', function(data) {
@@ -53,6 +53,7 @@ var calibration = (function(){
   }
 
   function resetCalibration(){
+    localStorage["isCalibrated"] = 0;    
     main.socket.emit("from-desktop-reset-calibration");
     renderInstructions("do-top-left");
   }
