@@ -4,6 +4,7 @@ app.main = (function(shared, connection, calibration, application) {
 
   var obj = {};
   obj.socket = {};
+  obj.pointer = document.querySelector("#pointer");
 
   obj.init = function(){
     console.log('Initializing app.');

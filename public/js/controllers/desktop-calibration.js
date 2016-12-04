@@ -29,8 +29,10 @@ var calibration = (function(){
     main.socket.on("to-desktop-bottom-right-confirmation", function(data) {
       console.log(data);
       localStorage["isCalibrated"] = 1;
+      main.pointer.classList.remove("hidden");
       renderInstructions("do-done");
     });
+
     main.socket.on('to-desktop-coordinates', function(data) {
       console.log(data);
       movePointer(data);
@@ -57,15 +59,38 @@ var calibration = (function(){
   }
 
   function resetCalibration(){
-    localStorage["isCalibrated"] = 0;    
+    localStorage["isCalibrated"] = 0;
+    main.pointer.classList.add("hidden");
     main.socket.emit("from-desktop-reset-calibration");
     renderInstructions("do-center");
   }
 
   function movePointer(data){
-    pointer.style["top"] = data["pos"].y + "px";
-    pointer.style["left"] = data["pos"].x + "px";
+    main.pointer.style["top"] = data["pos"].y + "px";
+    main.pointer.style["left"] = data["pos"].x + "px";
   }
+
+  // DEBUG: use this to check if the gyroscope and magnetometer are working correctly
+  function displayOrientation(){
+    
+    document.querySelector("#do-results").classList.remove("hidden");
+
+    var tiltLeftToRight = event.gamma;  // left-to-right tilt in degrees, where right is positive
+    var tiltFrontToBack = event.beta;   // front-to-back tilt in degrees, where front is positive
+    var direction = event.alpha;        // compass direction the device is facing in degrees
+
+    // rotate image using CSS3 transform
+    var cube = document.getElementById('cube');
+    cube.style.webkitTransform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    cube.style.MozTransform = 'rotate(' + tiltLeftToRight + 'deg)';
+    cube.style.transform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+
+    // set HTML content = tilt OR direction degree (rounded to nearest integer)
+    document.getElementById('doTiltFrontToBack').innerHTML = "beta: " + Math.round(tiltFrontToBack);
+    document.getElementById('doTiltLeftToRight').innerHTML = "gamma: " + Math.round(tiltLeftToRight);
+    document.getElementById('doDirection').innerHTML = "alpha: " + Math.round(direction);
+    document.getElementById('is-absolute').innerHTML = event.absolute ? "true" : "false";
+  }  
 
   return obj;
 })();

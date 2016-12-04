@@ -7,6 +7,7 @@ var connection = (function(){
   
   obj.init = function(){
     console.log("init connection");
+    main.pointer.classList.add("hidden");
     addSocketListeners();
     attachEvents();
   };
