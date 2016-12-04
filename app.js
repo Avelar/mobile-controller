@@ -92,6 +92,12 @@ io.on('connection', function(socket) {
   });
 
   socket.on("from-mobile-calibrate-top-left", function(data){
+    console.log("SOCKET: from-mobile-calibrate-center");
+    console.log(data);
+    socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-center-confirmation", "User aimed at center");
+  });
+
+  socket.on("from-mobile-calibrate-top-left", function(data){
     console.log("SOCKET: from-mobile-calibrate-top-left");
     console.log(data);
     calibrateMobileTopLeft(socket.id, data);

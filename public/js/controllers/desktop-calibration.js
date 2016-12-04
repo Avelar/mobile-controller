@@ -18,6 +18,10 @@ var calibration = (function(){
 
   function addSocketlisteners(){
 
+    main.socket.on("to-desktop-center-confirmation", function(data) {
+      console.log(data);
+      renderInstructions("do-top-left");
+    });
     main.socket.on("to-desktop-top-left-confirmation", function(data) {
       console.log(data);
       renderInstructions("do-bottom-right");

@@ -57,8 +57,8 @@ var shared = (function(){
   }
 
   function disconnect(){
-    localStorage["isConnected"] = false;
-    localStorage["isCalibrated"] = false;
+    localStorage["isConnected"] = 0;
+    localStorage["isCalibrated"] = 0;
     location.hash = "connection";
   }
 
