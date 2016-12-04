@@ -105,9 +105,12 @@ var calibration = (function(){
 
     // rotate image using CSS3 transform
     var cube = document.getElementById('cube');
-    cube.style.webkitTransform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
-    cube.style.MozTransform = 'rotate(' + tiltLeftToRight + 'deg)';
-    cube.style.transform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    // cube.style.webkitTransform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    // cube.style.MozTransform = 'rotate(' + tiltLeftToRight + 'deg)';
+    // cube.style.transform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    cube.style.webkitTransform = 'rotate(' + (direction * -1) + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    cube.style.MozTransform = 'rotate(' + (direction * -1) + 'deg)';
+    cube.style.transform = 'rotate(' + (direction * -1) + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
 
     // set HTML content = tilt OR direction degree (rounded to nearest integer)
     document.getElementById('doTiltFrontToBack').innerHTML = "beta: " + Math.round(tiltFrontToBack);
