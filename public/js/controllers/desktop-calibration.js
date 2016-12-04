@@ -3,31 +3,34 @@ var calibration = (function(){
   console.log("Loaded module: calibration");
   
   var obj = {};             // This module
-  var socket;               // Shared across modules
+  var main;                 // Main app, shared across modules
 
-  obj.init = function(_socket){
-    socket = _socket;
-    renderInstructions("do-top-left");
-    socketSetup();
+  obj.init = function(){
+    console.log("init calibration");
+    resetCalibration();    
+    addSocketlisteners();
+    attachEvents();
   };
 
-  function socketSetup(){
+  obj.setMainApp = function(_main){
+    main = _main;
+  };
 
-    socket.on("to-desktop-top-left-confirmation", function(data) {
+  function addSocketlisteners(){
+
+    main.socket.on("to-desktop-top-left-confirmation", function(data) {
       console.log(data);
       renderInstructions("do-bottom-right");
     });
-    socket.on("to-desktop-bottom-right-confirmation", function(data) {
+    main.socket.on("to-desktop-bottom-right-confirmation", function(data) {
       console.log(data);
       localStorage["isCalibrated"] = true;
       renderInstructions("do-done");
     });
-    socket.on('to-desktop-coordinates', function(data) {
+    main.socket.on('to-desktop-coordinates', function(data) {
       console.log(data);
       movePointer(data);
     });
-
-    attachEvents();
   }
 
   function attachEvents(){
@@ -37,7 +40,7 @@ var calibration = (function(){
     var continueBt = document.querySelector("#continue-bt");
     continueBt.addEventListener("click", function(){
       location.hash = "application";
-      socket.emit("from-desktop-start-application");
+      main.socket.emit("from-desktop-start-application");
     });
   }
 
@@ -50,7 +53,7 @@ var calibration = (function(){
   }
 
   function resetCalibration(){
-    socket.emit("from-desktop-reset-calibration");
+    main.socket.emit("from-desktop-reset-calibration");
     renderInstructions("do-top-left");
   }
 

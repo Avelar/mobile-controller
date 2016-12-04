@@ -3,20 +3,24 @@ var connection = (function(){
   console.log("Loaded module: connection");
   
   var obj = {};             // This module
-  var socket;               // Shared across modules
-
-  obj.init = function(_socket){
-    console.log("init");
-    socket = _socket;
-    socketSetup();
+  var main;                 // Main app, shared across modules
+  
+  obj.init = function(){
+    console.log("init connection");
+    addSocketListeners();
+    attachEvents();
   };
 
-  function socketSetup(){
+  obj.setMainApp = function(_main){
+    main = _main;
+  };
 
-    console.log("socketSetup");
+  function addSocketListeners(){
+
+    console.log("addSocketListeners");
 
     // Start by asking to be added to the list of users and sending screen dimensions
-    socket.emit('from-desktop-add', {
+    main.socket.emit('from-desktop-add', {
       width: window.innerWidth,
       height: window.innerHeight
     }, function(data){
@@ -24,13 +28,11 @@ var connection = (function(){
       document.querySelector("#key").innerHTML = data;
     });
 
-    socket.on('to-desktop-confirm-connection', function(data) {
+    main.socket.on('to-desktop-confirm-connection', function(data) {
       console.log(data);
       localStorage["isConnected"] = true;
       location.hash = "calibration";
     });
-
-    attachEvents();
   }
 
   function attachEvents(){

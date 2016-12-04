@@ -2,16 +2,20 @@ var application = (function(){
   console.log("Loaded module: calibration");
   
   var obj = {};             // This module
-  var socket;               // Shared across modules
+  var main;                 // Main app, shared across modules
 
-  obj.init = function(_socket){
-    socket = _socket;
-    socketSetup();
+  obj.init = function(){
+    console.log("init application");
+    addSocketlisteners();
+    attachEvents();
   };
 
-  function socketSetup(){
+  obj.setMainApp = function(_main){
+    main = _main;
+  };
 
-    attachEvents();
+  function addSocketlisteners(){
+
   }
 
   function attachEvents(){

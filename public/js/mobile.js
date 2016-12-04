@@ -2,39 +2,45 @@ var app = app || {};
 
 app.main = (function(shared, connection, calibration, application) {
 
-  var socket;
-  var controller = {
+  var obj = {};
+  obj.socket = {};
+  obj.controller = {
     orientation: {
       x: "",
       y: ""
     }
   };
-  localStorage["isConnected"] = false;
-  localStorage["isCalibrated"] = false;
 
-  function init(){
+  obj.init = function(){
     console.log('Initializing app.');
+
     location.hash = "";
-    socketSetup();
-  }
+    localStorage["isConnected"] = false;
+    localStorage["isCalibrated"] = false;
+
+    initSocket();
+  };
 
   // Initializing socket and adding listener functions
-  function socketSetup(){
+  function initSocket(){
   
     console.log("socketSetup");
   
-    socket = io.connect();
+    obj.socket = io.connect();
 
-    socket.on('welcome', function(data) {
+    obj.socket.on('welcome', function(data) {
       console.log(data.msg);
       console.log(data.users);
       attachEvents();
+      // Sending main app (obj) to shared, so modules can have access to global vars (socket & controller)
+      // Sending the modules too, so they can be executed on hash change
+      shared.setModules(obj, {connection, calibration, application});      
     });
 
-    // socket.on('to-all-user-disconnected', function(data){
+    // obj.socket.on('to-all-user-disconnected', function(data){
     //   console.log(data);
     // });
-    socket.on('to-all-partner-disconnected', function(data){
+    obj.socket.on('to-all-partner-disconnected', function(data){
       console.log(data);
       shared.disconnect();
     });
@@ -44,28 +50,14 @@ app.main = (function(shared, connection, calibration, application) {
     window.removeEventListener('hashchange', shared.hashRouter);
     window.addEventListener('hashchange', shared.hashRouter);
     // if(window.DeviceOrientationEvent){
-      initModules();
+      // initModules();
+      location.hash = "connection";      
     // }else{
     //   location.hash = "unsupported";
     // }
   }
 
-  function initModules(){
-
-    console.log("initModules");
-
-    // We have to send the local socket object to the external modules,
-    // so that they can communicate with the server
-    connection.init(socket, controller);
-    calibration.init(socket, controller);
-
-    // Now let's call our first "page", connection
-    location.hash = "connection";
-  }
-
-  return {
-    init: init
-  };
+  return obj;
 
 })(shared, connection, calibration, application); // Pass our external modules to the local scope
 

@@ -3,16 +3,20 @@ var application = (function(){
   console.log("Loaded module: application");
 
   var obj = {};             // This module
-  var socket, controller;   // Shared across modules
+  var main;                 // Main app, shared across modules
 
-  obj.init = function(_socket, _controller){
-    socket = _socket;
-    controller = _controller;
-    socketSetup();
+  obj.init = function(){
+    console.log("init application");
+    addSocketListeners();
+    attachEvents();
   };
 
-  function socketSetup(){
-	attachEvents();
+  obj.setMainApp = function(_main){
+    main = _main;
+  };
+
+  function addSocketListeners(){
+
   }
 
   function attachEvents(){

@@ -3,26 +3,30 @@ var calibration = (function(){
   console.log("Loaded module: calibration");
 
   var obj = {};             // This module
-  var socket, controller;   // Shared across modules
+  var main;                 // Main app, shared across modules
 
   var debug = false;        // Local to this module
   var touches = 0;
   var isTouching = false;
 
-  obj.init = function(_socket, _controller){
-    socket = _socket;
-    controller = _controller;
-    socketSetup();
+  obj.init = function(){
+    console.log("init calibration");
+    resetCalibration();
+    addSocketListeners();
+    attachEvents();
   };
 
-  function socketSetup(){
-    socket.on("to-mobile-reset-calibration", function(){
+  obj.setMainApp = function(_main){
+    main = _main;
+  };
+
+  function addSocketListeners(){
+    main.socket.on("to-mobile-reset-calibration", function(){
       resetCalibration();
     });
-    socket.on("to-mobile-start-application", function(){
+    main.socket.on("to-mobile-start-application", function(){
       location.hash = "application";
     });
-    attachEvents();
   }
 
   function attachEvents(){
@@ -46,7 +50,7 @@ var calibration = (function(){
 
   function resetCalibration(){
     touches = 0;
-    controller["isCalibrated"] = false;
+    main.controller["isCalibrated"] = false;
     document.getElementById("calibrate-msg").innerHTML = "TOP-LEFT";
     document.querySelector("#calibrate-bt").classList.remove("hidden");
     document.querySelector("#hit-bt").classList.add("hidden");
@@ -65,20 +69,20 @@ var calibration = (function(){
       if(touches === 1) {
         
         data = {
-          alphaMin: controller["orientation"].x,
-          betaMax: controller["orientation"].y
+          alphaMin: main.controller["orientation"].x,
+          betaMax: main.controller["orientation"].y
         };
-        socket.emit('from-mobile-calibrate-top-left', data);
+        main.socket.emit('from-mobile-calibrate-top-left', data);
         msg.innerHTML = "BOTTOM-RIGHT";
 
       }else if(touches === 2) {
 
         data = {
-          alphaMax: controller["orientation"].x,
-          betaMin: controller["orientation"].y
+          alphaMax: main.controller["orientation"].x,
+          betaMin: main.controller["orientation"].y
         };
-        socket.emit('from-mobile-calibrate-bottom-right', data);
-        controller["isCalibrated"] = true;        
+        main.socket.emit('from-mobile-calibrate-bottom-right', data);
+        main.controller["isCalibrated"] = true;        
         document.querySelector("#calibrate-bt").classList.add("hidden");
         document.querySelector("#hit-bt").classList.remove("hidden");
         
@@ -100,14 +104,14 @@ var calibration = (function(){
   function getOrientation(){
     var tiltFrontToBack = event.beta;
     var direction = event.alpha;
-    controller["orientation"] = {
+    main.controller["orientation"] = {
       x: direction, y: -tiltFrontToBack
     };
   }
 
   function emitOrientation(){
-    socket.emit('orientation', {
-      orientation: controller["orientation"],
+    main.socket.emit('orientation', {
+      orientation: main.controller["orientation"],
       isTouching: isTouching
     });
     if(isTouching) isTouching = false;
@@ -140,7 +144,7 @@ var calibration = (function(){
 
 // app.main = (function() {
 
-//   var socket;
+//   var main.socket;
 //   var orientation = {};
 //   var isCalibrated = false;
 //   var isDrawing = false;

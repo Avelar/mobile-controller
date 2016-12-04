@@ -3,23 +3,24 @@ var connection = (function(){
   console.log("Loaded module: connection");
   
   var obj = {};             // This module
-  var socket, controller;   // Shared across modules
+  var main;                 // Main app, shared across modules
 
-  obj.init = function(_socket, _controller){
-    socket = _socket;
-    controller = _controller;
-    socketSetup();
+  obj.init = function(){
+    console.log("init connection");
+    addSocketListeners();
+    attachEvents();
   };
 
-  function socketSetup(){
-    
-    // Start by asking to be added to th list of users and sending screen dimensions
-    socket.emit('from-mobile-add');
-    socket.on('to-mobile-confirm-connection', function(data) {
+  obj.setMainApp = function(_main){
+    main = _main;
+  };
+
+  function addSocketListeners(){
+    // Start by asking to be added to the list of users and sending screen dimensions
+    main.socket.emit('from-mobile-add');
+    main.socket.on('to-mobile-confirm-connection', function(data) {
       console.log(data);
     });
-
-    attachEvents();
   }
 
   function attachEvents(){
@@ -40,7 +41,7 @@ var connection = (function(){
   function matchKey(){
     var key = document.querySelector("#key-input").value;
 
-    socket.emit("from-mobile-match-key", key, function(data){
+    main.socket.emit("from-mobile-match-key", key, function(data){
       console.log(data);
       localStorage["isConnected"] = true;
       if(data === "right-key"){
