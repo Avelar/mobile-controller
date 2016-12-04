@@ -2,8 +2,8 @@ var calibration = (function(){
 
   console.log("Loaded module: calibration");
 
-  var obj = {};             // This module
-  var main;                 // Main app, shared across modules
+  var obj = {};           // This module
+  var main;               // Main app, shared across modules
 
   var debug;              // Local to this module
   var touches;
@@ -37,10 +37,16 @@ var calibration = (function(){
   function attachEvents(){
     //listen for event and handle DeviceOrientationEvent object
     window.removeEventListener('deviceorientation', main.controller.emitOrientation);
-    window.removeEventListener('deviceorientation', displayOrientation);
+    window.removeEventListener('deviceorientation', function(){
+      shared.displayOrientation(main.controller.orientation);
+    });
 
     window.addEventListener('deviceorientation', main.controller.emitOrientation);
-    if(debug) window.addEventListener('deviceorientation', displayOrientation);
+    if(debug){
+      window.addEventListener('deviceorientation', function(){
+        displayOrientation(main.controller.orientation);
+      });      
+    }
 
     var calibrateBt = document.querySelector("#calibrate-bt");
     calibrateBt.removeEventListener("click", calibrate);
@@ -67,21 +73,11 @@ var calibration = (function(){
        
       }else if(touches === 2) {
         
-        // data = {
-        //   alphaMin: main.controller["orientation"].x,
-        //   betaMax: main.controller["orientation"].y
-        // };
-        // main.socket.emit('from-mobile-calibrate-top-left', data);
         main.socket.emit('from-mobile-calibrate-top-left', {orientation: main.controller.orientation});
         msg.innerHTML = "BOTTOM-RIGHT";
 
       }else if(touches === 3) {
 
-        // data = {
-        //   alphaMax: main.controller["orientation"].x,
-        //   betaMin: main.controller["orientation"].y
-        // };
-        // main.socket.emit('from-mobile-calibrate-bottom-right', data);
         main.socket.emit('from-mobile-calibrate-bottom-right', {orientation: main.controller.orientation});
         localStorage["isCalibrated"] = true;        
         document.querySelector("#calibrate-bt").classList.add("hidden");
@@ -99,13 +95,13 @@ var calibration = (function(){
   }
 
   // DEBUG: use this to check if the gyroscope and magnetometer are working correctly
-  function displayOrientation(){
+  function displayOrientation(data){
     
     document.querySelector("#do-results").classList.remove("hidden");
 
-    var tiltLeftToRight = main.controller.orientation.tiltLeftToRight;  // left-to-right tilt in degrees, where right is positive
-    var tiltFrontToBack = main.controller.orientation.tiltFrontToBack;  // front-to-back tilt in degrees, where front is positive
-    var direction = main.controller.orientation.direction;              // compass direction the device is facing in degrees
+    var tiltLeftToRight = data.tiltLeftToRight;  // left-to-right tilt in degrees, where right is positive
+    var tiltFrontToBack = data.tiltFrontToBack;  // front-to-back tilt in degrees, where front is positive
+    var direction = data.direction;              // compass direction the device is facing in degrees
 
     // rotate image using CSS3 transform
     var cube = document.getElementById('cube');
@@ -118,7 +114,7 @@ var calibration = (function(){
     document.getElementById('doTiltLeftToRight').innerHTML = "gamma: " + Math.round(tiltLeftToRight);
     document.getElementById('doDirection').innerHTML = "alpha: " + Math.round(direction);
     document.getElementById('is-absolute').innerHTML = event.absolute ? "true" : "false";
-  }
+  }   
 
   return obj;
 })();

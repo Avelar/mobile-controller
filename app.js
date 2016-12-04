@@ -120,11 +120,16 @@ io.on('connection', function(socket) {
       users[socket.id]['isTouching'] = data.isTouching;
   
       if(users[socket.id]["partner"] !== ""){
+        
+        socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-orientation", data["orientation"]);
+
         updateUserPosition(socket.id, data, function(){
+
           socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-coordinates", {
             pos: users[socket.id]["pos"],
             isTouching: users[socket.id]['isTouching']
           });
+
         });
       }
     }

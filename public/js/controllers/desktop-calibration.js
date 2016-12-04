@@ -33,6 +33,11 @@ var calibration = (function(){
       renderInstructions("do-done");
     });
 
+    main.socket.on('to-desktop-orientation', function(data) {
+      console.log(data);
+      displayOrientation(data);
+    });
+
     main.socket.on('to-desktop-coordinates', function(data) {
       console.log(data);
       movePointer(data);
@@ -75,15 +80,19 @@ var calibration = (function(){
     
     document.querySelector("#do-results").classList.remove("hidden");
 
-    var tiltLeftToRight = data.gamma;  // left-to-right tilt in degrees, where right is positive
-    var tiltFrontToBack = data.beta;   // front-to-back tilt in degrees, where front is positive
-    var direction = data.alpha;        // compass direction the device is facing in degrees
+    var tiltLeftToRight = data.tiltLeftToRight;   // left-to-right tilt in degrees, where right is positive
+    var tiltFrontToBack = data.tiltFrontToBack;   // front-to-back tilt in degrees, where front is positive
+    var direction = data.direction;               // compass direction the device is facing in degrees
 
     // rotate image using CSS3 transform
     var cube = document.getElementById('cube');
-    cube.style.webkitTransform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
-    cube.style.MozTransform = 'rotate(' + tiltLeftToRight + 'deg)';
-    cube.style.transform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    // cube.style.webkitTransform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    // cube.style.MozTransform = 'rotate(' + tiltLeftToRight + 'deg)';
+    // cube.style.transform = 'rotate(' + tiltLeftToRight + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+
+    cube.style.webkitTransform = 'rotate(' + (direction * -1) + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
+    cube.style.MozTransform = 'rotate(' + (direction * -1) + 'deg)';
+    cube.style.transform = 'rotate(' + (direction * -1) + 'deg) rotate3d(1,0,0, ' + (tiltFrontToBack * -1) + 'deg)';
 
     // set HTML content = tilt OR direction degree (rounded to nearest integer)
     document.getElementById('doTiltFrontToBack').innerHTML = "beta: " + Math.round(tiltFrontToBack);
