@@ -5,12 +5,17 @@ var calibration = (function(){
   var obj = {};             // This module
   var main;                 // Main app, shared across modules
 
-  var debug = false;        // Local to this module
-  var touches = 0;
-  var isTouching = false;
+  var debug;              // Local to this module
+  var touches;
+  var isTouching;
 
   obj.init = function(){
     console.log("init calibration");
+
+    debug = false;
+    touches = 0;
+    isTouching = false;
+
     resetCalibration();
     addSocketListeners();
     attachEvents();
@@ -51,6 +56,7 @@ var calibration = (function(){
   function resetCalibration(){
     touches = 0;
     localStorage["isCalibrated"] = 0;
+    window.removeEventListener('deviceorientation', emitOrientation);
     document.getElementById("calibrate-msg").innerHTML = "TOP-LEFT";
     document.querySelector("#calibrate-bt").classList.remove("hidden");
     document.querySelector("#hit-bt").classList.add("hidden");
@@ -85,7 +91,7 @@ var calibration = (function(){
         document.querySelector("#calibrate-bt").classList.add("hidden");
         document.querySelector("#hit-bt").classList.remove("hidden");
         
-        window.addEventListener('deviceorientation', getOrientation);        
+        window.addEventListener('deviceorientation', emitOrientation);        
       }
     }
   }
@@ -104,7 +110,8 @@ var calibration = (function(){
     var tiltFrontToBack = event.beta;
     var direction = event.alpha;
     main.controller["orientation"] = {
-      x: direction, y: -tiltFrontToBack
+      x: direction,
+      y: -tiltFrontToBack
     };
   }
 

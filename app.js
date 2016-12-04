@@ -17,14 +17,14 @@ app.use('*', function(req, res) {
   // Say if req.headers['user-agent'] contains "Mobile", re-route the user to mobile interface
   var ua = req.headers['user-agent'];
   
-  // if (ua.indexOf('Mobile') > -1) {
-  //   console.log('User is using mobile device');
+  if (ua.indexOf('Mobile') > -1) {
+    console.log('User is using mobile device');
     res.redirect('mobile.html');
-  // } else {
-  //   // Else display a desktop version
-  //   console.log('User is using desktop device');
-  //   res.redirect('desktop.html');
-  // }
+  } else {
+    // Else display a desktop version
+    console.log('User is using desktop device');
+    res.redirect('desktop.html');
+  }
 });
 
 server.listen(PORT, function(){
@@ -110,14 +110,18 @@ io.on('connection', function(socket) {
     console.log('SOCKET: orientation');
     // console.log('has sent: ' + socket.id, data);
     
-    users[socket.id]['isTouching'] = data.isTouching;
-
-    updateUserPosition(socket.id, data, function(){
-      socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-coordinates", {
-        pos: users[socket.id]["pos"],
-        isTouching: users[socket.id]['isTouching']
-      });
-    });
+    if(users.hasOwnProperty(socket.id)){
+      users[socket.id]['isTouching'] = data.isTouching;
+  
+      if(users[socket.id]["partner"] !== ""){
+        updateUserPosition(socket.id, data, function(){
+          socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-coordinates", {
+            pos: users[socket.id]["pos"],
+            isTouching: users[socket.id]['isTouching']
+          });
+        });
+      }
+    }
     // console.log(users[socket.id]['isTouching']);
   });
   

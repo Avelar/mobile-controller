@@ -50,12 +50,11 @@ app.main = (function(shared, connection, calibration, application) {
   function attachEvents(){
     window.removeEventListener('hashchange', shared.hashRouter);
     window.addEventListener('hashchange', shared.hashRouter);
-    // if(window.DeviceOrientationEvent){
-      // initModules();
+    if(window.DeviceOrientationEvent){
       location.hash = "connection";      
-    // }else{
-    //   location.hash = "unsupported";
-    // }
+    }else{
+      location.hash = "unsupported";
+    }
   }
 
   return obj;
