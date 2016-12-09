@@ -11,7 +11,9 @@ app.main = (function(shared, connection, calibration, application) {
       direction: ""
     },
     isTouching: false,
-    emitOrientation: emitOrientation
+    emitOrientation: emitOrientation,
+    handleStart: handleStart,
+    handleEnd: handleEnd
   };
 
   obj.init = function(){
@@ -78,9 +80,12 @@ app.main = (function(shared, connection, calibration, application) {
 
   function emitOrientation(event){
     obj.controller["orientation"] = {
-      tiltLeftToRight: event.gamma,  // left-to-right tilt in degrees, where right is positive
-      tiltFrontToBack: event.beta,   // front-to-back tilt in degrees, where front is positive
-      direction: event.alpha         // compass direction the device is facing in degrees    
+      tiltLeftToRight: event.gamma, // GAMMA: left-to-right tilt in degrees, where right is positive
+      tiltFrontToBack: event.beta,  // BETA: front-to-back tilt in degrees, where front is positive
+      direction: event.alpha        // ALPHA: compass direction the device is facing in degrees;
+                                    // if deviceorientation is false, 0 is the angle the device
+                                    // was pointing at when the listener was added;
+                                    // increases counter-clockwise
     };
 
     obj.socket.emit('orientation', {
@@ -88,7 +93,7 @@ app.main = (function(shared, connection, calibration, application) {
       isTouching: obj.controller["isTouching"]
     });
 
-    if(obj.controller["isTouching"]) obj.controller["isTouching"] = false;    
+    if(obj.controller["isTouching"]) obj.controller["isTouching"] = false;
   }
 
   return obj;

@@ -4,6 +4,7 @@ var calibration = (function(){
   
   var obj = {};             // This module
   var main;                 // Main app, shared across modules
+  var pointer = document.querySelector("#pointer");  
 
   obj.init = function(){
     console.log("init calibration");
@@ -29,17 +30,13 @@ var calibration = (function(){
     main.socket.on("to-desktop-bottom-right-confirmation", function(data) {
       console.log(data);
       localStorage["isCalibrated"] = 1;
-      main.pointer.classList.remove("hidden");
+      pointer.classList.remove("hidden");
       renderInstructions("do-done");
     });
 
     main.socket.on('to-desktop-orientation', function(data) {
       console.log(data);
       displayOrientation(data);
-    });
-
-    main.socket.on('to-desktop-coordinates', function(data) {
-      console.log(data);
       movePointer(data);
     });
   }
@@ -65,24 +62,31 @@ var calibration = (function(){
 
   function resetCalibration(){
     localStorage["isCalibrated"] = 0;
-    main.pointer.classList.add("hidden");
+    pointer.classList.add("hidden");
     main.socket.emit("from-desktop-reset-calibration");
     renderInstructions("do-center");
   }
 
   function movePointer(data){
-    main.pointer.style["top"] = data["pos"].y + "px";
-    main.pointer.style["left"] = data["pos"].x + "px";
+    pointer.style["top"] = data["pos"].y + "px";
+    pointer.style["left"] = data["pos"].x + "px";
   }
+
+  function hitContinue(){
+    var continueBt = document.querySelector("#continue-bt");
+    if(){
+      
+    }
+  }  
 
   // DEBUG: use this to check if the gyroscope and magnetometer are working correctly
   function displayOrientation(data){
     
     document.querySelector("#do-results").classList.remove("hidden");
 
-    var tiltLeftToRight = data.tiltLeftToRight;   // left-to-right tilt in degrees, where right is positive
-    var tiltFrontToBack = data.tiltFrontToBack;   // front-to-back tilt in degrees, where front is positive
-    var direction = data.direction;               // compass direction the device is facing in degrees
+    var tiltLeftToRight = data["orientation"].tiltLeftToRight;   // left-to-right tilt in degrees, where right is positive
+    var tiltFrontToBack = data["orientation"].tiltFrontToBack;   // front-to-back tilt in degrees, where front is positive
+    var direction = data["orientation"].direction;               // compass direction the device is facing in degrees
 
     // rotate image using CSS3 transform
     var cube = document.getElementById('cube');
@@ -103,130 +107,3 @@ var calibration = (function(){
 
   return obj;
 })();
-
-// var app = app || {};
-
-// app.main = (function() {
-
-//   var socket;
-//   var canvas, context;
-//   var width, height;
-//   var localUsers = {};
-//   var pointer = document.querySelector("#pointer");
-
-//   // Initializing socket and adding listener functions
-//   function socketSetup(){
-
-//     socket = io.connect();
-//     socket.on('welcome', function(data){
-//       console.log('SOCKET: welcome');
-//       console.log(data.msg);
-      
-//       socket.emit('add-desktop', {
-//         width: window.innerWidth,
-//         height: window.innerHeight
-//       }, function(data){
-//         console.log(data);
-//         document.querySelector("#key").innerHTML = data;
-//       });
-//     });
-
-//     socket.on('render', function(data) {
-//       console.log(data);
-//       movePointer(data);
-//     });
-
-//     // socket.on('debug', function(data) {
-//     //   console.log(data);
-//     // });
-//     pointerSetup();
-//   }
-
-//   function pointerSetup(){
-//     pointer.style["width"] = "40px";
-//     pointer.style["height"] = "40px";
-//     pointer.style["border-radius"] = "20px";
-//     pointer.style["position"] = "absolute";
-//     pointer.style["background-color"] = "red";
-//   }
-
-//   function movePointer(data){
-//     pointer.style["top"] = data[user]['pos']['y'] + "px";
-//     pointer.style["left"] = data[user]['pos']['x'] + "px";
-//   }
-
-//   function init(){
-//     console.log('Initializing app.');
-//     socketSetup();
-//   }
-
-//   return {
-//     init: init
-//   };
-
-// })();
-
-// window.addEventListener('DOMContentLoaded', app.main.init);
-// var app = app || {};
-
-// app.main = (function() {
-
-//   var socket;
-//   var canvas, context;
-//   var width, height;
-//   var localUsers = {};
-//   var pointer = document.querySelector("#pointer");
-
-//   // Initializing socket and adding listener functions
-//   function socketSetup(){
-
-//     socket = io.connect();
-//     socket.on('welcome', function(data){
-//       console.log('SOCKET: welcome');
-//       console.log(data.msg);
-      
-//       socket.emit('add-desktop', {
-//         width: window.innerWidth,
-//         height: window.innerHeight
-//       }, function(data){
-//         console.log(data);
-//         document.querySelector("#key").innerHTML = data;
-//       });
-//     });
-
-//     socket.on('render', function(data) {
-//       console.log(data);
-//       movePointer(data);
-//     });
-
-//     // socket.on('debug', function(data) {
-//     //   console.log(data);
-//     // });
-//     pointerSetup();
-//   }
-
-//   function pointerSetup(){
-//     pointer.style["width"] = "40px";
-//     pointer.style["height"] = "40px";
-//     pointer.style["border-radius"] = "20px";
-//     pointer.style["position"] = "absolute";
-//     pointer.style["background-color"] = "red";
-//   }
-
-//   function movePointer(data){
-//     pointer.style["top"] = data[user]['pos']['y'] + "px";
-//     pointer.style["left"] = data[user]['pos']['x'] + "px";
-//   }
-
-//   function init(){
-//     console.log('Initializing app.');
-//     socketSetup();
-//   }
-
-//   return {
-//     init: init
-//   };
-
-// })();
-
-// window.addEventListener('DOMContentLoaded', app.main.init);

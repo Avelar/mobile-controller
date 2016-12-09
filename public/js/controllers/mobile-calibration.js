@@ -12,7 +12,7 @@ var calibration = (function(){
   obj.init = function(){
     console.log("init calibration");
 
-    debug = true;
+    debug = false;
     touches = 0;
     isTouching = false;
 
@@ -52,10 +52,10 @@ var calibration = (function(){
     calibrateBt.removeEventListener("click", calibrate);
     calibrateBt.addEventListener("click", calibrate);
 
-    // var hitBt = document.querySelector('#hit-bt');
-    // hitBt.addEventListener('touchstart', handleStart, false);
-    // hitBt.addEventListener('touchend', handleEnd, false);
-    // hitBt.addEventListener('touchcancel', handleEnd, false);
+    var hitBt = document.querySelector('#hit-bt');
+    hitBt.addEventListener('touchstart', main.controller.handleStart, false);
+    hitBt.addEventListener('touchend', main.controller.handleEnd, false);
+    hitBt.addEventListener('touchcancel', main.controller.handleEnd, false);
   }
 
   function calibrate(){
@@ -117,7 +117,7 @@ var calibration = (function(){
     document.getElementById('doTiltLeftToRight').innerHTML = "gamma: " + Math.round(tiltLeftToRight);
     document.getElementById('doDirection').innerHTML = "alpha: " + Math.round(direction);
     document.getElementById('is-absolute').innerHTML = event.absolute ? "true" : "false";
-  }   
+  }
 
   return obj;
 })();

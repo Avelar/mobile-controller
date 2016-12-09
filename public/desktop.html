@@ -8,24 +8,27 @@
       <link rel="stylesheet" href="css/style.desktop.css">
 	</head>
 	<body>
-
-      <div id="pointer" class="hidden"></div>      
-      
+     
       <section id="tpl-connection" class="hidden">
          <h1>Connection</h1>
          <div id="key"></div>
       </section>
 
       <section id="tpl-calibration" class="hidden">
+
          <h1>Calibration</h1>
          <div id="do-center" class="instructions">Hold your phone in front of the screen and tap it.</div>
          <div id="do-top-left" class="instructions">Now aim at the top-left corner and tap your phone.</div>
          <div id="do-bottom-right" class="instructions hidden">Now aim at the bottom-right corner and tap your phone.</div>
          <div id="do-done" class="instructions hidden">
-            You're all set!
+            <p>You're all set! Shoot the button to start!</p>
             <button id="continue-bt">Continue</button>
          </div>
-         <button id="reset-calibration-bt">Start over</button>
+         <p>
+            <button id="reset-calibration-bt">Start over</button>
+         </p>
+
+         <div id="pointer" class="hidden"></div>
 
          <!-- DEBUG -->
          <div id="do-results">      

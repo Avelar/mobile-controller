@@ -2,13 +2,13 @@
 
 ## Next
 
-* send orientation and coordinates as one single socket event (verify "if orientation")
+* ~~send orientation and coordinates as one single socket event~~
 * fix cube home position
+* application start (hitTest on button)
 
 ## Later
 
 * key validation (min/max)
 * ~~localStorage (to redirect non-connected?)~~
-* shoot!
-* application start (hitTest on button)
+* ~~shoot!~~
 * ~~review shared functions scope (orientation)~~

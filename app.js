@@ -114,19 +114,18 @@ io.on('connection', function(socket) {
   // Listening for coordinates
   socket.on('orientation', function(data) {
     console.log('SOCKET: orientation');
-    console.log('has sent: ' + socket.id, data);
+    // console.log('has sent: ' + socket.id, data);
     
     if(users.hasOwnProperty(socket.id)){
       users[socket.id]['isTouching'] = data.isTouching;
   
       if(users[socket.id]["partner"] !== ""){
-        
-        socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-orientation", data["orientation"]);
 
         updateUserPosition(socket.id, data, function(){
 
-          socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-coordinates", {
+          socket.broadcast.to(users[socket.id]["partner"]).emit("to-desktop-orientation", {
             pos: users[socket.id]["pos"],
+            orientation: users[socket.id]["orientation"],
             isTouching: users[socket.id]['isTouching']
           });
 
@@ -169,6 +168,11 @@ function addMobileUser(id) {
         pos: {
           x: "",
           y: ""
+        },
+        orientation: {
+          tiltLeftToRight: "",
+          tiltFrontToBack: "",
+          direction: ""
         },
         isTouching: false,
         partner: ""
@@ -253,14 +257,17 @@ function updateUserPosition(id, data, callback){
     // console.log('in:\t' + data.orientation.x);
     // console.log('in:\t' + data.orientation.y);    
 
-    angleToPosition(id, data.orientation.direction, "x");
-    angleToPosition(id, -data.orientation.tiltFrontToBack, "y");
+    users[id]["orientation"] = data.orientation;
+    users[id]["pos"]["x"] = angleToPosition(id, data.orientation.direction, "x");
+    users[id]["pos"]["y"] = angleToPosition(id, -data.orientation.tiltFrontToBack, "y");
 
-    callback();
+    callback();   // Emit mapped coordinates + orientation to desktop
   }
 }
 
 function angleToPosition(id, angle, axis){
+
+  var pos;
   
   angle = fixAngle(angle);
 
@@ -272,15 +279,16 @@ function angleToPosition(id, angle, axis){
   var dimensions = users[partner]["dimensions"];
 
   if(axis === "x"){
-    users[id]['pos'][axis] = map(angle,
-                            users[id]['offset'][axis]["min"], users[id]['offset'][axis]["max"],
-                            0, dimensions[axis]);
+    pos = map(angle,
+              users[id]['offset'][axis]["min"], users[id]['offset'][axis]["max"],
+              0, dimensions[axis]);
   }else{
-    users[id]['pos'][axis] = map(angle,
-                            users[id]['offset'][axis]["min"], users[id]['offset'][axis]["max"],
-                            dimensions[axis], 0); // y is inverted :/
+    pos = map(angle,
+              users[id]['offset'][axis]["min"], users[id]['offset'][axis]["max"],
+              dimensions[axis], 0); // y is inverted :/
   }
-  users[id]['pos'][axis] = Math.round(users[id]['pos'][axis]);
+  pos = Math.round(pos);
+  return pos;
 }
 
 
