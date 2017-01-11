@@ -4,10 +4,11 @@ var connection = (function(){
   
   var obj = {};             // This module
   var main;                 // Main app, shared across modules
+  var pointer = document.querySelector("#pointer");
   
   obj.init = function(){
     console.log("init connection");
-    main.pointer.classList.add("hidden");
+    pointer.classList.add("hidden");
     addSocketListeners();
     attachEvents();
   };

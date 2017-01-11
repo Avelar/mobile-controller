@@ -2,7 +2,7 @@
 var express   = require('express'),
   bodyParser  = require('body-parser');     // helper for parsing HTTP requests
 var app = express();                        // our Express app
-var PORT = 3334;
+var PORT = 4000;
 var server = require('http').Server(app);   // Socket.io setup
 var io = require('socket.io')(server);
 

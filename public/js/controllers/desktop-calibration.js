@@ -4,11 +4,12 @@ var calibration = (function(){
   
   var obj = {};             // This module
   var main;                 // Main app, shared across modules
-  var pointer = document.querySelector("#pointer");  
+  var pointer = document.querySelector("#pointer");
 
   obj.init = function(){
     console.log("init calibration");
-    resetCalibration();    
+    resetCalibration();
+    pointer.classList.remove("hidden");
     addSocketlisteners();
     attachEvents();
   };
@@ -74,9 +75,10 @@ var calibration = (function(){
 
   function hitContinue(){
     var continueBt = document.querySelector("#continue-bt");
-    if(){
+    // sdsdsdsdsds
+    // if(){
       
-    }
+    // }
   }  
 
   // DEBUG: use this to check if the gyroscope and magnetometer are working correctly
