@@ -6,6 +6,17 @@ var calibration = (function(){
   var main;                 // Main app, shared across modules
   var pointer = document.querySelector("#pointer");
 
+  // Buttons and actions
+  var buttons = [];
+  buttons.push(document.querySelector("#start-bt"));
+
+  var actions = {
+    start: function(){
+      location.hash = "application";
+      main.socket.emit("from-desktop-start-application");
+    }
+  };
+
   obj.init = function(){
     console.log("init calibration");
     resetCalibration();
@@ -36,9 +47,12 @@ var calibration = (function(){
     });
 
     main.socket.on('to-desktop-orientation', function(data) {
-      console.log(data);
+      // console.log(data);
       displayOrientation(data);
       movePointer(data);
+      if(data["isTouching"]){
+        clickPointer(data);
+      }
     });
   }
 
@@ -46,10 +60,9 @@ var calibration = (function(){
     var resetCalibrationBt = document.querySelector("#reset-calibration-bt");
     resetCalibrationBt.addEventListener("click", resetCalibration);
 
-    var continueBt = document.querySelector("#continue-bt");
-    continueBt.addEventListener("click", function(){
-      location.hash = "application";
-      main.socket.emit("from-desktop-start-application");
+    var startBt = document.querySelector("#start-bt");
+    startBt.addEventListener("click", function(){
+      actions["start"]();
     });
   }
 
@@ -71,15 +84,20 @@ var calibration = (function(){
   function movePointer(data){
     pointer.style["top"] = data["pos"].y + "px";
     pointer.style["left"] = data["pos"].x + "px";
+
   }
 
-  function hitContinue(){
-    var continueBt = document.querySelector("#continue-bt");
-    // sdsdsdsdsds
-    // if(){
-      
-    // }
-  }  
+  function clickPointer(data){
+    for(var i = 0; i < buttons.length; i++){
+      if(buttons[i].offsetLeft < data["pos"].x + pointer.offsetWidth/2 && data["pos"].x + pointer.offsetWidth/2 < buttons[i].offsetLeft + buttons[i].offsetWidth &&
+         buttons[i].offsetTop < data["pos"].y + pointer.offsetHeight/2 && data["pos"].y + pointer.offsetHeight/2 < buttons[i].offsetTop + buttons[i].offsetHeight){
+          var btAction = buttons[i].id;
+          btAction = btAction.substring(0, btAction.indexOf("-"));
+          console.log(btAction);
+          actions[btAction]();
+      }
+    }
+  }
 
   // DEBUG: use this to check if the gyroscope and magnetometer are working correctly
   function displayOrientation(data){
